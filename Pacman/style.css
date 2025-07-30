@@ -5,24 +5,31 @@
 }
 
 body {
-    font-family: 'Courier New', monospace;
-    background: #000;
-    color: #ffff00;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    background: linear-gradient(45deg, #2d5016, #3d6b1a);
+    color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 1px, transparent 1px),
+        radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
 .game-container {
-    background: #000;
-    border: 3px solid #0000ff;
-    border-radius: 10px;
+    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+    border: 4px solid #8B4513;
+    border-radius: 8px;
     padding: 20px;
     text-align: center;
     max-width: 800px;
     width: 100%;
+    box-shadow: 
+        inset 0 0 20px rgba(139, 69, 19, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
 .game-header {
@@ -33,11 +40,14 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background: #000080;
-    padding: 10px;
-    border: 2px solid #0000ff;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    background: linear-gradient(145deg, #8B4513, #A0522D);
+    padding: 15px;
+    border: 3px solid #654321;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.1),
+        inset -2px -2px 4px rgba(0,0,0,0.3);
 }
 
 .score, .high-score, .lives {
@@ -47,15 +57,17 @@ body {
 }
 
 .label {
-    font-size: 12px;
+    font-size: 10px;
     color: #ffffff;
     margin-bottom: 5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .value {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
-    color: #ffff00;
+    color: #00ff00;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .lives-display {
@@ -65,12 +77,13 @@ body {
 
 .life {
     font-size: 16px;
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));
 }
 
 .game-board {
-    background: #000;
-    border: 3px solid #0000ff;
-    border-radius: 5px;
+    background: #2d2d2d;
+    border: 4px solid #8B4513;
+    border-radius: 4px;
     margin: 0 auto 20px auto;
     position: relative;
     width: 600px;
@@ -78,6 +91,9 @@ body {
     display: grid;
     grid-template-columns: repeat(21, 1fr);
     grid-template-rows: repeat(21, 1fr);
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.5),
+        0 4px 8px rgba(0,0,0,0.3);
 }
 
 .cell {
@@ -90,55 +106,127 @@ body {
 }
 
 .wall {
-    background: #0000ff;
-    border: 1px solid #4040ff;
+    background: linear-gradient(145deg, #6B4423, #8B4513);
+    border: 1px solid #654321;
+    box-shadow: 
+        inset 1px 1px 2px rgba(255,255,255,0.1),
+        inset -1px -1px 2px rgba(0,0,0,0.3);
 }
 
 .path {
-    background: #000;
+    background: linear-gradient(145deg, #1a4a0a, #2d5a1a);
+    border: 1px solid #3d6a2a;
 }
 
 .dot {
-    width: 4px;
-    height: 4px;
-    background: #ffff00;
-    border-radius: 50%;
+    width: 6px;
+    height: 6px;
+    background: #00ff00;
+    border-radius: 2px;
     position: absolute;
+    box-shadow: 0 0 4px #00ff00;
+    animation: emerald-shine 2s infinite;
 }
 
 .big-dot {
-    width: 12px;
-    height: 12px;
-    background: #ffff00;
-    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    background: linear-gradient(45deg, #ff4500, #ffaa00);
+    border-radius: 3px;
     position: absolute;
-    animation: pulse 1s infinite;
+    animation: golden-apple-pulse 1s infinite;
+    box-shadow: 0 0 8px #ff4500;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+@keyframes emerald-shine {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.7;
+        transform: scale(1.1);
+        box-shadow: 0 0 8px #00ff00;
+    }
+}
+
+@keyframes golden-apple-pulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.8; 
+        transform: scale(1.2);
+        box-shadow: 0 0 12px #ff4500;
+    }
 }
 
 .pacman {
     width: 80%;
     height: 80%;
-    background: #ffff00;
-    border-radius: 50%;
+    background: linear-gradient(145deg, #4a90e2, #6bb6ff);
+    border: 2px solid #2d5aa0;
     position: absolute;
     z-index: 10;
     transition: all 0.1s ease;
-    animation: chomp 0.3s infinite;
+    animation: steve-walk 0.4s infinite;
     top: 10%;
     left: 10%;
+    border-radius: 2px;
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.3),
+        inset -2px -2px 4px rgba(0,0,0,0.3),
+        0 2px 4px rgba(0,0,0,0.5);
 }
 
-@keyframes chomp {
+.pacman::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    width: 60%;
+    height: 40%;
+    background: #8B4513;
+    border-radius: 1px;
+    box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2);
+}
+
+.pacman.power-mode {
+    animation: steve-walk 0.2s infinite, power-enchant 0.5s infinite alternate;
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.3),
+        inset -2px -2px 4px rgba(0,0,0,0.3),
+        0 0 15px #9966ff,
+        0 0 25px #9966ff;
+}
+
+@keyframes steve-walk {
     0%, 100% {
-        clip-path: circle(50% at 50% 50%);
+        transform: translateY(0px);
     }
     50% {
-        clip-path: circle(50% at 50% 50%) polygon(50% 50%, 85% 35%, 85% 65%);
+        transform: translateY(-1px);
+    }
+}
+
+@keyframes power-enchant {
+    0% { 
+        transform: scale(1) translateY(0px);
+        box-shadow: 
+            inset 2px 2px 4px rgba(255,255,255,0.3),
+            inset -2px -2px 4px rgba(0,0,0,0.3),
+            0 0 10px #9966ff,
+            0 0 20px #9966ff;
+    }
+    100% { 
+        transform: scale(1.05) translateY(-1px);
+        box-shadow: 
+            inset 2px 2px 4px rgba(255,255,255,0.3),
+            inset -2px -2px 4px rgba(0,0,0,0.3),
+            0 0 20px #9966ff,
+            0 0 30px #9966ff,
+            0 0 40px #cc99ff;
     }
 }
 
@@ -161,30 +249,102 @@ body {
 .ghost {
     width: 80%;
     height: 80%;
-    background: #ff0000;
-    border-radius: 50% 50% 0 0;
+    border: 2px solid #333;
     position: absolute;
     z-index: 10;
     transition: all 0.1s ease;
-    animation: float 2s ease-in-out infinite;
+    animation: mob-float 2s ease-in-out infinite;
     top: 10%;
     left: 10%;
+    border-radius: 2px;
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.1),
+        inset -2px -2px 4px rgba(0,0,0,0.3),
+        0 2px 4px rgba(0,0,0,0.5);
+}
+
+.ghost.red {
+    background: linear-gradient(145deg, #cc0000, #ff3333);
+    border-color: #990000;
+}
+
+.ghost.pink {
+    background: linear-gradient(145deg, #ff1493, #ff69b4);
+    border-color: #c0154f;
+}
+
+.ghost.cyan {
+    background: linear-gradient(145deg, #00bfff, #87ceeb);
+    border-color: #0099cc;
+}
+
+.ghost.orange {
+    background: linear-gradient(145deg, #ff8c00, #ffa500);
+    border-color: #cc7000;
+}
+
+.ghost.vulnerable {
+    background: linear-gradient(145deg, #4169e1, #6495ed) !important;
+    border-color: #2e4bb8 !important;
+    animation: mob-float 2s ease-in-out infinite, vulnerable-flash 0.5s infinite;
+}
+
+@keyframes vulnerable-flash {
+    0%, 50% { 
+        background: linear-gradient(145deg, #4169e1, #6495ed) !important;
+        box-shadow: 
+            inset 2px 2px 4px rgba(255,255,255,0.1),
+            inset -2px -2px 4px rgba(0,0,0,0.3),
+            0 0 8px #4169e1;
+    }
+    51%, 100% { 
+        background: linear-gradient(145deg, #ffffff, #f0f0f0) !important;
+        box-shadow: 
+            inset 2px 2px 4px rgba(255,255,255,0.1),
+            inset -2px -2px 4px rgba(0,0,0,0.3),
+            0 0 8px #ffffff;
+    }
+}
+
+@keyframes mob-float {
+    0%, 100% { 
+        transform: translateY(0px);
+    }
+    50% { 
+        transform: translateY(-2px);
+    }
 }
 
 .ghost::after {
     content: '';
     position: absolute;
-    bottom: -20%;
-    left: 0;
-    width: 100%;
-    height: 20%;
-    background: #ff0000;
-    clip-path: polygon(0 0, 25% 100%, 50% 0, 75% 100%, 100% 0, 100% 100%, 0 100%);
+    top: 15%;
+    left: 15%;
+    width: 70%;
+    height: 40%;
+    background: rgba(255,0,0,0.8);
+    border-radius: 1px;
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.3);
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-2px); }
+.ghost.red::after {
+    background: rgba(255,0,0,0.8);
+}
+
+.ghost.pink::after {
+    background: rgba(255,20,147,0.8);
+}
+
+.ghost.cyan::after {
+    background: rgba(0,191,255,0.8);
+}
+
+.ghost.orange::after {
+    background: rgba(255,140,0,0.8);
+}
+
+.ghost.vulnerable::after {
+    background: rgba(65,105,225,0.8) !important;
 }
 
 .game-controls {
@@ -234,11 +394,11 @@ body {
 .dpad-btn {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #ffff00, #ffdd00);
-    border: 3px solid #0000ff;
-    border-radius: 15px;
-    color: #000;
-    font-size: 24px;
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    border: 3px solid #654321;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
     user-select: none;
@@ -246,25 +406,35 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.1),
+        inset -2px -2px 4px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.3);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .dpad-btn:active {
     transform: scale(0.9);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(135deg, #ffdd00, #ffcc00);
+    box-shadow: 
+        inset 2px 2px 4px rgba(0,0,0,0.3),
+        inset -2px -2px 4px rgba(255,255,255,0.1),
+        0 2px 4px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #654321, #8B4513);
 }
 
 .dpad-btn:hover {
-    background: linear-gradient(135deg, #ffff80, #ffe680);
+    background: linear-gradient(135deg, #A0522D, #CD853F);
 }
 
 .dpad-center {
     width: 30px;
     height: 30px;
-    background: #333;
-    border-radius: 50%;
-    border: 2px solid #666;
+    background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+    border-radius: 2px;
+    border: 2px solid #555;
+    box-shadow: 
+        inset 1px 1px 2px rgba(255,255,255,0.1),
+        inset -1px -1px 2px rgba(0,0,0,0.5);
 }
 
 .game-buttons {
@@ -274,24 +444,38 @@ body {
 }
 
 .game-btn {
-    background: #ffff00;
-    color: #000;
-    border: none;
-    padding: 10px 20px;
-    font-size: 14px;
+    background: linear-gradient(145deg, #8B4513, #A0522D);
+    color: #ffffff;
+    border: 3px solid #654321;
+    padding: 12px 24px;
+    font-size: 12px;
     font-weight: bold;
-    border-radius: 5px;
+    font-family: 'Press Start 2P', monospace;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.1),
+        inset -2px -2px 4px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.3);
 }
 
 .game-btn:hover {
-    background: #ffff80;
-    transform: scale(1.05);
+    background: linear-gradient(145deg, #A0522D, #CD853F);
+    transform: translateY(-2px);
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.2),
+        inset -2px -2px 4px rgba(0,0,0,0.3),
+        0 6px 12px rgba(0,0,0,0.4);
 }
 
 .game-btn:active {
-    transform: scale(0.95);
+    transform: translateY(0px);
+    box-shadow: 
+        inset 2px 2px 4px rgba(0,0,0,0.3),
+        inset -2px -2px 4px rgba(255,255,255,0.1),
+        0 2px 4px rgba(0,0,0,0.3);
 }
 
 .game-over {
@@ -308,24 +492,31 @@ body {
 }
 
 .game-over-content {
-    background: #000080;
-    border: 3px solid #0000ff;
-    border-radius: 10px;
+    background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+    border: 4px solid #8B4513;
+    border-radius: 8px;
     padding: 40px;
     text-align: center;
-    color: #ffff00;
+    color: #ffffff;
+    box-shadow: 
+        inset 0 0 20px rgba(139, 69, 19, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
 .game-over-content h2 {
-    font-size: 32px;
+    font-size: 24px;
     margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(255, 255, 0, 0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    color: #ff4444;
+    font-family: 'Press Start 2P', monospace;
 }
 
 .game-over-content p {
-    font-size: 18px;
+    font-size: 14px;
     margin-bottom: 30px;
     color: #ffffff;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Responsive design */

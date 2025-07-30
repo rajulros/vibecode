@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pac-Man Game</title>
+    <title>Minecraft Maze Runner</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="game-container">
         <div class="game-header">
             <div class="score-board">
                 <div class="score">
-                    <span class="label">SCORE</span>
+                    <span class="label">EMERALDS</span>
                     <span class="value" id="score">0</span>
                 </div>
                 <div class="high-score">
-                    <span class="label">HIGH SCORE</span>
+                    <span class="label">BEST SCORE</span>
                     <span class="value" id="high-score">0</span>
                 </div>
                 <div class="lives">
-                    <span class="label">LIVES</span>
+                    <span class="label">HEARTS</span>
                     <div class="lives-display" id="lives-display">
-                        <span class="life">🟡</span>
-                        <span class="life">🟡</span>
-                        <span class="life">🟡</span>
+                        <span class="life">❤️</span>
+                        <span class="life">❤️</span>
+                        <span class="life">❤️</span>
                     </div>
                 </div>
             </div>
@@ -35,9 +38,9 @@
         
         <div class="game-controls">
             <div class="instructions">
-                <p class="desktop-instruction">Use ARROW KEYS to move Pac-Man</p>
-                <p class="mobile-instruction">Use buttons below or swipe to move Pac-Man</p>
-                <p>Eat all dots to win! Avoid the ghost!</p>
+                <p class="desktop-instruction">Use ARROW KEYS to move Steve</p>
+                <p class="mobile-instruction">Use buttons below or swipe to move Steve</p>
+                <p>Collect emeralds and avoid the hostile mobs!</p>
             </div>
             
             <!-- Mobile Touch Controls -->
@@ -54,16 +57,16 @@
             </div>
             
             <div class="game-buttons">
-                <button id="start-btn" class="game-btn">START GAME</button>
-                <button id="reset-btn" class="game-btn">RESET</button>
+                <button id="start-btn" class="game-btn">START ADVENTURE</button>
+                <button id="reset-btn" class="game-btn">RESPAWN</button>
             </div>
         </div>
         
         <div class="game-over" id="game-over" style="display: none;">
             <div class="game-over-content">
                 <h2 id="game-over-title">GAME OVER</h2>
-                <p id="game-over-message">Better luck next time!</p>
-                <button id="play-again-btn" class="game-btn">PLAY AGAIN</button>
+                <p id="game-over-message">You were defeated by hostile mobs!</p>
+                <button id="play-again-btn" class="game-btn">RESPAWN</button>
             </div>
         </div>
     </div>

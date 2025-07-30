@@ -6,7 +6,10 @@ let gameState = {
     gameRunning: false,
     gameWon: false,
     totalDots: 0,
-    dotsEaten: 0
+    dotsEaten: 0,
+    powerMode: false,
+    powerModeTimer: 0,
+    powerModeDuration: 8000 // 8 seconds
 };
 
 // Game board dimensions
@@ -14,17 +17,21 @@ const BOARD_SIZE = 21;
 
 // Player and ghost positions
 let pacmanPos = { x: 10, y: 15 };
-let ghostPos = { x: 10, y: 9 };
+let ghosts = [
+    { x: 10, y: 9, direction: { x: 1, y: 0 }, color: 'red', vulnerable: false, id: 'ghost-1' },
+    { x: 9, y: 9, direction: { x: -1, y: 0 }, color: 'pink', vulnerable: false, id: 'ghost-2' },
+    { x: 11, y: 9, direction: { x: 0, y: 1 }, color: 'cyan', vulnerable: false, id: 'ghost-3' },
+    { x: 10, y: 10, direction: { x: 0, y: -1 }, color: 'orange', vulnerable: false, id: 'ghost-4' }
+];
 let pacmanDirection = { x: 0, y: 0 };
 let nextDirection = { x: 0, y: 0 };
-let ghostDirection = { x: 1, y: 0 };
 
 // Game elements
 let gameBoard;
 let pacmanElement;
-let ghostElement;
 let gameInterval;
 let ghostInterval;
+let powerModeInterval;
 
 // Maze layout (1 = wall, 0 = path with dot, 2 = path without dot, 3 = big dot)
 const maze = [
@@ -102,7 +109,7 @@ function createPacman() {
 
 // Create Ghost
 function createGhost() {
-    updateGhostPosition();
+    updateAllGhostPositions();
 }
 
 // Update Pac-Man position
@@ -117,28 +124,28 @@ function updatePacmanPosition() {
     const targetCell = document.getElementById(`cell-${pacmanPos.x}-${pacmanPos.y}`);
     if (targetCell) {
         pacmanElement = document.createElement('div');
-        pacmanElement.className = 'pacman right';
+        pacmanElement.className = gameState.powerMode ? 'pacman power-mode right' : 'pacman right';
         pacmanElement.id = 'pacman';
         targetCell.appendChild(pacmanElement);
     }
 }
 
-// Update Ghost position
-function updateGhostPosition() {
-    // Remove ghost from current cell
-    const currentGhost = document.querySelector('.ghost');
-    if (currentGhost && currentGhost.parentNode) {
-        currentGhost.remove();
-    }
+// Update all ghost positions
+function updateAllGhostPositions() {
+    // Remove all existing ghosts
+    const existingGhosts = document.querySelectorAll('[id^="ghost-"]');
+    existingGhosts.forEach(ghost => ghost.remove());
     
-    // Add ghost to new cell
-    const targetCell = document.getElementById(`cell-${ghostPos.x}-${ghostPos.y}`);
-    if (targetCell) {
-        ghostElement = document.createElement('div');
-        ghostElement.className = 'ghost';
-        ghostElement.id = 'ghost';
-        targetCell.appendChild(ghostElement);
-    }
+    // Add ghosts to their new positions
+    ghosts.forEach(ghost => {
+        const targetCell = document.getElementById(`cell-${ghost.x}-${ghost.y}`);
+        if (targetCell) {
+            const ghostElement = document.createElement('div');
+            ghostElement.className = ghost.vulnerable ? `ghost ${ghost.color} vulnerable` : `ghost ${ghost.color}`;
+            ghostElement.id = ghost.id;
+            targetCell.appendChild(ghostElement);
+        }
+    });
 }
 
 // Check if position is valid (not a wall)
@@ -204,6 +211,9 @@ function checkDotCollection() {
         bigDot.remove();
         gameState.score += 50;
         gameState.dotsEaten++;
+        
+        // Activate enchanted mode (power mode)
+        activatePowerMode();
     }
     
     updateDisplay();
@@ -214,69 +224,162 @@ function checkDotCollection() {
     }
 }
 
-// Move Ghost (simple AI)
-function moveGhost() {
-    const possibleMoves = [
-        { x: 1, y: 0 },   // right
-        { x: -1, y: 0 },  // left
-        { x: 0, y: 1 },   // down
-        { x: 0, y: -1 }   // up
-    ];
+// Activate power mode
+function activatePowerMode() {
+    gameState.powerMode = true;
+    gameState.powerModeTimer = gameState.powerModeDuration;
     
-    // Filter out invalid moves and the opposite direction (to prevent immediate reversal)
-    const validMoves = possibleMoves.filter(move => {
-        const newX = ghostPos.x + move.x;
-        const newY = ghostPos.y + move.y;
-        const isOpposite = move.x === -ghostDirection.x && move.y === -ghostDirection.y;
-        return isValidPosition(newX, newY) && !isOpposite;
+    // Make all ghosts vulnerable
+    ghosts.forEach(ghost => {
+        ghost.vulnerable = true;
     });
     
-    if (validMoves.length === 0) {
-        // If no valid moves, reverse direction
-        ghostDirection.x = -ghostDirection.x;
-        ghostDirection.y = -ghostDirection.y;
-    } else if (validMoves.length === 1) {
-        // Only one valid move
-        ghostDirection = validMoves[0];
-    } else {
-        // Multiple valid moves - choose one towards Pac-Man or random
-        const dx = pacmanPos.x - ghostPos.x;
-        const dy = pacmanPos.y - ghostPos.y;
+    updateAllGhostPositions();
+    updatePacmanPosition(); // Update Pac-Man appearance
+    
+    // Start power mode countdown
+    if (powerModeInterval) {
+        clearInterval(powerModeInterval);
+    }
+    
+    powerModeInterval = setInterval(() => {
+        gameState.powerModeTimer -= 100;
         
-        // 70% chance to move towards Pac-Man, 30% chance random
-        if (Math.random() < 0.7) {
-            const towardsPacman = validMoves.filter(move => {
-                return (dx > 0 && move.x > 0) || (dx < 0 && move.x < 0) ||
-                       (dy > 0 && move.y > 0) || (dy < 0 && move.y < 0);
-            });
-            
-            if (towardsPacman.length > 0) {
-                ghostDirection = towardsPacman[Math.floor(Math.random() * towardsPacman.length)];
-            } else {
-                ghostDirection = validMoves[Math.floor(Math.random() * validMoves.length)];
-            }
-        } else {
-            ghostDirection = validMoves[Math.floor(Math.random() * validMoves.length)];
+        if (gameState.powerModeTimer <= 0) {
+            deactivatePowerMode();
         }
-    }
+    }, 100);
+}
+
+// Deactivate power mode
+function deactivatePowerMode() {
+    gameState.powerMode = false;
+    gameState.powerModeTimer = 0;
     
-    // Move the ghost
-    const newX = ghostPos.x + ghostDirection.x;
-    const newY = ghostPos.y + ghostDirection.y;
+    // Make all ghosts normal again
+    ghosts.forEach(ghost => {
+        ghost.vulnerable = false;
+    });
     
-    if (isValidPosition(newX, newY)) {
-        ghostPos.x = newX;
-        ghostPos.y = newY;
-        updateGhostPosition();
-        checkCollision();
+    updateAllGhostPositions();
+    updatePacmanPosition(); // Update Pac-Man appearance
+    
+    if (powerModeInterval) {
+        clearInterval(powerModeInterval);
+        powerModeInterval = null;
     }
+}
+
+// Move Ghost (simple AI)
+function moveGhost() {
+    ghosts.forEach((ghost, index) => {
+        const possibleMoves = [
+            { x: 1, y: 0 },   // right
+            { x: -1, y: 0 },  // left
+            { x: 0, y: 1 },   // down
+            { x: 0, y: -1 }   // up
+        ];
+        
+        // Filter out invalid moves and the opposite direction
+        const validMoves = possibleMoves.filter(move => {
+            const newX = ghost.x + move.x;
+            const newY = ghost.y + move.y;
+            const isOpposite = move.x === -ghost.direction.x && move.y === -ghost.direction.y;
+            return isValidPosition(newX, newY) && !isOpposite;
+        });
+        
+        if (validMoves.length === 0) {
+            // If no valid moves, reverse direction
+            ghost.direction.x = -ghost.direction.x;
+            ghost.direction.y = -ghost.direction.y;
+        } else if (validMoves.length === 1) {
+            // Only one valid move
+            ghost.direction = validMoves[0];
+        } else {
+            // Multiple valid moves - different behavior based on ghost and power mode
+            const dx = pacmanPos.x - ghost.x;
+            const dy = pacmanPos.y - ghost.y;
+            
+            let chaseChance = 0.7; // Default chase probability
+            
+            // Different AI behaviors for different ghosts
+            switch(ghost.color) {
+                case 'red': chaseChance = 0.8; break;    // Most aggressive
+                case 'pink': chaseChance = 0.6; break;   // Moderate
+                case 'cyan': chaseChance = 0.5; break;   // Less aggressive
+                case 'orange': chaseChance = 0.4; break; // Least aggressive
+            }
+            
+            // If vulnerable, run away from Pac-Man
+            if (ghost.vulnerable) {
+                chaseChance = 0.1; // 10% chance to chase, 90% to run away
+            }
+            
+            if (Math.random() < chaseChance && !ghost.vulnerable) {
+                // Chase Pac-Man
+                const towardsPacman = validMoves.filter(move => {
+                    return (dx > 0 && move.x > 0) || (dx < 0 && move.x < 0) ||
+                           (dy > 0 && move.y > 0) || (dy < 0 && move.y < 0);
+                });
+                
+                if (towardsPacman.length > 0) {
+                    ghost.direction = towardsPacman[Math.floor(Math.random() * towardsPacman.length)];
+                } else {
+                    ghost.direction = validMoves[Math.floor(Math.random() * validMoves.length)];
+                }
+            } else if (ghost.vulnerable) {
+                // Run away from Pac-Man
+                const awayFromPacman = validMoves.filter(move => {
+                    return (dx > 0 && move.x < 0) || (dx < 0 && move.x > 0) ||
+                           (dy > 0 && move.y < 0) || (dy < 0 && move.y > 0);
+                });
+                
+                if (awayFromPacman.length > 0) {
+                    ghost.direction = awayFromPacman[Math.floor(Math.random() * awayFromPacman.length)];
+                } else {
+                    ghost.direction = validMoves[Math.floor(Math.random() * validMoves.length)];
+                }
+            } else {
+                // Random movement
+                ghost.direction = validMoves[Math.floor(Math.random() * validMoves.length)];
+            }
+        }
+        
+        // Move the ghost
+        const newX = ghost.x + ghost.direction.x;
+        const newY = ghost.y + ghost.direction.y;
+        
+        if (isValidPosition(newX, newY)) {
+            ghost.x = newX;
+            ghost.y = newY;
+        }
+    });
+    
+    updateAllGhostPositions();
+    checkCollision();
 }
 
 // Check collision between Pac-Man and Ghost
 function checkCollision() {
-    if (pacmanPos.x === ghostPos.x && pacmanPos.y === ghostPos.y) {
-        loseLife();
-    }
+    ghosts.forEach((ghost, index) => {
+        if (pacmanPos.x === ghost.x && pacmanPos.y === ghost.y) {
+            if (ghost.vulnerable && gameState.powerMode) {
+                // Eat the ghost!
+                gameState.score += 200 * (index + 1); // Progressive scoring
+                
+                // Reset ghost to center position and make it normal
+                ghost.x = 10;
+                ghost.y = 9;
+                ghost.vulnerable = false;
+                ghost.direction = { x: Math.random() > 0.5 ? 1 : -1, y: 0 };
+                
+                updateAllGhostPositions();
+            } else if (!ghost.vulnerable) {
+                loseLife();
+                return;
+            }
+        }
+    });
 }
 
 // Lose a life
@@ -302,13 +405,21 @@ function loseLife() {
 // Reset Pac-Man and Ghost positions
 function resetPositions() {
     pacmanPos = { x: 10, y: 15 };
-    ghostPos = { x: 10, y: 9 };
+    
+    // Reset all ghosts to their starting positions
+    ghosts[0] = { x: 10, y: 9, direction: { x: 1, y: 0 }, color: 'red', vulnerable: false, id: 'ghost-1' };
+    ghosts[1] = { x: 9, y: 9, direction: { x: -1, y: 0 }, color: 'pink', vulnerable: false, id: 'ghost-2' };
+    ghosts[2] = { x: 11, y: 9, direction: { x: 0, y: 1 }, color: 'cyan', vulnerable: false, id: 'ghost-3' };
+    ghosts[3] = { x: 10, y: 10, direction: { x: 0, y: -1 }, color: 'orange', vulnerable: false, id: 'ghost-4' };
+    
     pacmanDirection = { x: 0, y: 0 };
     nextDirection = { x: 0, y: 0 };
-    ghostDirection = { x: 1, y: 0 };
+    
+    // Reset power mode
+    deactivatePowerMode();
     
     updatePacmanPosition();
-    updateGhostPosition();
+    updateAllGhostPositions();
 }
 
 // Start game
@@ -351,7 +462,7 @@ function winGame() {
     gameState.score += gameState.lives * 100;
     
     updateHighScore();
-    showGameOver('LEVEL COMPLETE!', 'Congratulations! You won!');
+    showGameOver('ADVENTURE COMPLETE!', 'You collected all the emeralds! Well done, miner!');
 }
 
 // Game over
@@ -360,7 +471,7 @@ function gameOver() {
     stopGameLoop();
     
     updateHighScore();
-    showGameOver('GAME OVER', 'Better luck next time!');
+    showGameOver('YOU DIED!', 'The hostile mobs overwhelmed you! Respawn to try again.');
 }
 
 // Update high score
@@ -388,9 +499,17 @@ function resetGame() {
     gameState.gameRunning = false;
     gameState.gameWon = false;
     gameState.dotsEaten = 0;
+    gameState.powerMode = false;
+    gameState.powerModeTimer = 0;
     
-    document.getElementById('start-btn').textContent = 'START GAME';
+    document.getElementById('start-btn').textContent = 'START ADVENTURE';
     document.getElementById('game-over').style.display = 'none';
+    
+    // Clear power mode interval
+    if (powerModeInterval) {
+        clearInterval(powerModeInterval);
+        powerModeInterval = null;
+    }
     
     resetPositions();
     createBoard();
@@ -407,7 +526,7 @@ function updateDisplay() {
     for (let i = 0; i < gameState.lives; i++) {
         const life = document.createElement('span');
         life.className = 'life';
-        life.textContent = '🟡';
+        life.textContent = '❤️';
         livesDisplay.appendChild(life);
     }
 }
