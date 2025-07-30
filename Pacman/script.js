@@ -179,13 +179,13 @@ function movePacman() {
         
         // Update Pac-Man's visual direction
         if (pacmanDirection.x > 0) {
-            pacmanElement.className = 'pacman right';
+            pacmanElement.className = gameState.powerMode ? 'pacman power-mode right' : 'pacman right';
         } else if (pacmanDirection.x < 0) {
-            pacmanElement.className = 'pacman left';
+            pacmanElement.className = gameState.powerMode ? 'pacman power-mode left' : 'pacman left';
         } else if (pacmanDirection.y > 0) {
-            pacmanElement.className = 'pacman down';
+            pacmanElement.className = gameState.powerMode ? 'pacman power-mode down' : 'pacman down';
         } else if (pacmanDirection.y < 0) {
-            pacmanElement.className = 'pacman up';
+            pacmanElement.className = gameState.powerMode ? 'pacman power-mode up' : 'pacman up';
         }
         
         updatePacmanPosition();
@@ -394,7 +394,7 @@ function loseLife() {
         resetPositions();
         // Brief pause before continuing
         setTimeout(() => {
-            if (gameState.gameRunning) {
+            if (gameState.lives > 0) {
                 startGameLoop();
             }
         }, 1000);
@@ -539,20 +539,20 @@ function setupEventListeners() {
         
         switch(e.key) {
             case 'ArrowUp':
-                nextDirection = { x: 0, y: -1 };
                 e.preventDefault();
+                nextDirection = { x: 0, y: -1 };
                 break;
             case 'ArrowDown':
-                nextDirection = { x: 0, y: 1 };
                 e.preventDefault();
+                nextDirection = { x: 0, y: 1 };
                 break;
             case 'ArrowLeft':
-                nextDirection = { x: -1, y: 0 };
                 e.preventDefault();
+                nextDirection = { x: -1, y: 0 };
                 break;
             case 'ArrowRight':
-                nextDirection = { x: 1, y: 0 };
                 e.preventDefault();
+                nextDirection = { x: 1, y: 0 };
                 break;
         }
     });
@@ -576,50 +576,38 @@ function setupTouchControls() {
     dpadButtons.forEach(button => {
         button.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (!gameState.gameRunning) return;
-            
-            const direction = button.getAttribute('data-direction');
-            switch(direction) {
-                case 'up':
-                    nextDirection = { x: 0, y: -1 };
-                    break;
-                case 'down':
-                    nextDirection = { x: 0, y: 1 };
-                    break;
-                case 'left':
-                    nextDirection = { x: -1, y: 0 };
-                    break;
-                case 'right':
-                    nextDirection = { x: 1, y: 0 };
-                    break;
-            }
+            handleDirectionInput(button.dataset.direction);
         });
         
         // Also handle click events for desktop testing
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            if (!gameState.gameRunning) return;
-            
-            const direction = button.getAttribute('data-direction');
-            switch(direction) {
-                case 'up':
-                    nextDirection = { x: 0, y: -1 };
-                    break;
-                case 'down':
-                    nextDirection = { x: 0, y: 1 };
-                    break;
-                case 'left':
-                    nextDirection = { x: -1, y: 0 };
-                    break;
-                case 'right':
-                    nextDirection = { x: 1, y: 0 };
-                    break;
-            }
+            handleDirectionInput(button.dataset.direction);
         });
     });
     
     // Swipe gesture controls
     setupSwipeControls();
+}
+
+// Handle direction input from touch controls
+function handleDirectionInput(direction) {
+    if (!gameState.gameRunning) return;
+    
+    switch(direction) {
+        case 'up':
+            nextDirection = { x: 0, y: -1 };
+            break;
+        case 'down':
+            nextDirection = { x: 0, y: 1 };
+            break;
+        case 'left':
+            nextDirection = { x: -1, y: 0 };
+            break;
+        case 'right':
+            nextDirection = { x: 1, y: 0 };
+            break;
+    }
 }
 
 // Setup swipe gesture controls
@@ -659,20 +647,16 @@ function setupSwipeControls() {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
             // Horizontal swipe
             if (deltaX > 0) {
-                // Swipe right
-                nextDirection = { x: 1, y: 0 };
+                nextDirection = { x: 1, y: 0 }; // Right
             } else {
-                // Swipe left
-                nextDirection = { x: -1, y: 0 };
+                nextDirection = { x: -1, y: 0 }; // Left
             }
         } else {
             // Vertical swipe
             if (deltaY > 0) {
-                // Swipe down
-                nextDirection = { x: 0, y: 1 };
+                nextDirection = { x: 0, y: 1 }; // Down
             } else {
-                // Swipe up
-                nextDirection = { x: 0, y: -1 };
+                nextDirection = { x: 0, y: -1 }; // Up
             }
         }
     }
