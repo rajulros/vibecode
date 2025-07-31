@@ -38,66 +38,173 @@ class VibeWordle {
         this.currentHint = '';
         this.revealedPositions = new Set();
         
-        // Word Lists (organized by difficulty)
+        // Word Lists (organized by difficulty - all 5-letter words)
         this.wordLists = {
             easy: [
-                'CATS', 'DOGS', 'BIRD', 'FISH', 'LOVE', 'GAME', 'PLAY', 'TREE', 'BOOK', 'MOON',
-                'STAR', 'FIRE', 'WIND', 'ROCK', 'GOLD', 'BLUE', 'PINK', 'FAST', 'SLOW', 'JUMP',
-                'SING', 'DANCE', 'HAPPY', 'SMILE', 'LAUGH', 'SWEET', 'KIND', 'WARM', 'COOL', 'RAIN'
+                'BEACH', 'BREAD', 'CHAIR', 'DREAM', 'EARTH', 'FIGHT', 'GLASS', 'HOUSE', 'LIGHT', 'MUSIC',
+                'NIGHT', 'OCEAN', 'PEACE', 'QUEEN', 'RIVER', 'SMILE', 'TIGER', 'UNITY', 'VOICE', 'WORLD',
+                'APPLE', 'BLAZE', 'CLOUD', 'DANCE', 'EAGLE', 'FLAME', 'GRACE', 'HEART', 'IMAGE', 'JUICE',
+                'KNIFE', 'LEMON', 'MAGIC', 'NOVEL', 'OPERA', 'PLANT', 'QUICK', 'RADIO', 'STONE', 'TRAIN'
             ],
             normal: [
                 'SPACE', 'DREAM', 'OCEAN', 'MAGIC', 'LIGHT', 'PEACE', 'BRAVE', 'SHINE', 'STORM', 'QUEST',
                 'POWER', 'GRACE', 'TRUTH', 'HONOR', 'FAITH', 'SPARK', 'BLAZE', 'FROST', 'CRANE', 'DANCE',
-                'PIANO', 'GUITAR', 'MELODY', 'RHYTHM', 'HARMONY', 'CASTLE', 'BRIDGE', 'GARDEN', 'FOREST', 'MOUNTAIN',
-                'PUZZLE', 'RIDDLE', 'SECRET', 'WONDER', 'MARVEL', 'COSMIC', 'CRYSTAL', 'PRISM', 'AURORA', 'GALAXY',
-                'STELLAR', 'NEBULA', 'PORTAL', 'MYSTIC', 'CIPHER', 'MATRIX', 'VECTOR', 'PLASMA', 'PHOTON', 'QUANTUM'
+                'PIANO', 'PRISM', 'COSMIC', 'GALAXY', 'PORTAL', 'MYSTIC', 'CIPHER', 'MATRIX', 'VECTOR', 'PLASMA',
+                'PUZZLE', 'RIDDLE', 'SECRET', 'WONDER', 'MARVEL', 'AURORA', 'PHOTON', 'BRIDGE', 'CASTLE', 'GARDEN'
             ],
             hard: [
-                'COMPLEX', 'JOURNEY', 'HARMONY', 'BALANCE', 'DESTINY', 'FREEDOM', 'JUSTICE', 'WISDOM', 'COURAGE', 'MYSTERY',
-                'ECLIPSE', 'THUNDER', 'RAINBOW', 'CRYSTAL', 'ENCHANT', 'FANTASY', 'MIRACLE', 'TRIUMPH', 'DIAMOND', 'PHOENIX',
-                'FORTRESS', 'ADVENTURE', 'DISCOVERY', 'INNOVATION', 'CREATION', 'ARTISTIC', 'BRILLIANT', 'MAGNIFICENT', 'SPECTACULAR', 'EXTRAORDINARY'
+                'AZURE', 'BIJOU', 'CABAL', 'DANDY', 'ETHIC', 'FROCK', 'GUILD', 'HAVOC', 'IRATE', 'JOUST',
+                'KARMA', 'LEAPT', 'MIRTH', 'NYMPH', 'OZONE', 'PSALM', 'QUARK', 'RELIC', 'SCYTHE', 'THYME',
+                'ULTRA', 'VIGOR', 'WRATH', 'XERUS', 'YOUTH', 'ZESTY', 'EPOCH', 'FJORD', 'GLYPH', 'HYENA'
             ],
             expert: [
-                'SYMPHONY', 'MYSTICAL', 'ETHEREAL', 'SERENITY', 'HARMONY', 'JOURNEY', 'TRIUMPH', 'DESTINY', 'PHOENIX', 'CRYSTAL',
-                'ENCHANTED', 'ADVENTURE', 'DISCOVERY', 'FANTASTIC', 'BRILLIANT', 'MAJESTIC', 'SPLENDID', 'GORGEOUS', 'AMAZING', 'PERFECT',
-                'WONDERFUL', 'BEAUTIFUL', 'STUNNING', 'FABULOUS', 'AWESOME', 'INCREDIBLE', 'MAGNIFICENT', 'SPECTACULAR', 'OUTSTANDING', 'EXCEPTIONAL'
+                'ABHOR', 'BERTH', 'CHAOS', 'DJINN', 'EPOXY', 'FJORD', 'GHOUL', 'HELIX', 'INBOX', 'JAZZY',
+                'KNACK', 'LYMPH', 'MURKY', 'NICHE', 'OOMPH', 'PLUMP', 'QUELL', 'RHYME', 'SKULK', 'TWERP',
+                'ULCER', 'VERVE', 'WHISK', 'XEROX', 'YODEL', 'ZILCH', 'ABODE', 'BRAWL', 'CRISP', 'DWARF'
             ]
         };
         
-        // Word hints (contextual clues)
+        // Word hints (contextual clues for 5-letter words)
         this.wordHints = {
-            'SPACE': 'The final frontier explored by astronauts',
+            // Easy words
+            'BEACH': 'Sandy shore by the ocean',
+            'BREAD': 'Baked food made from flour and water',
+            'CHAIR': 'Furniture for sitting',
             'DREAM': 'What happens in your mind while you sleep',
-            'OCEAN': 'Vast body of saltwater covering most of Earth',
-            'MAGIC': 'Supernatural power that defies explanation',
+            'EARTH': 'The planet we live on',
+            'FIGHT': 'To engage in combat or struggle',
+            'GLASS': 'Transparent material for windows',
+            'HOUSE': 'Building where people live',
             'LIGHT': 'Electromagnetic radiation visible to the eye',
+            'MUSIC': 'Art form using sound and rhythm',
+            'NIGHT': 'Time when it is dark',
+            'OCEAN': 'Vast body of saltwater covering most of Earth',
             'PEACE': 'State of harmony and absence of conflict',
+            'QUEEN': 'Female monarch or ruler',
+            'RIVER': 'Large flowing body of water',
+            'SMILE': 'Happy facial expression',
+            'TIGER': 'Large striped wild cat',
+            'UNITY': 'State of being united or joined',
+            'VOICE': 'Sound produced by speaking or singing',
+            'WORLD': 'The entire planet Earth',
+            'APPLE': 'Red or green fruit that grows on trees',
+            'BLAZE': 'Bright flame or intense fire',
+            'CLOUD': 'Mass of water vapor in the sky',
+            'DANCE': 'Rhythmic movement to music',
+            'EAGLE': 'Large bird of prey with sharp talons',
+            'FLAME': 'Hot glowing gas from fire',
+            'GRACE': 'Elegant movement or divine favor',
+            'HEART': 'Organ that pumps blood',
+            'IMAGE': 'Visual representation or picture',
+            'JUICE': 'Liquid extracted from fruits',
+            'KNIFE': 'Sharp tool for cutting',
+            'LEMON': 'Yellow citrus fruit',
+            'MAGIC': 'Supernatural power that defies explanation',
+            'NOVEL': 'Long fictional story book',
+            'OPERA': 'Dramatic musical theater performance',
+            'PLANT': 'Living organism that grows in soil',
+            'QUICK': 'Moving or acting with speed',
+            'RADIO': 'Device for receiving broadcast signals',
+            'STONE': 'Hard solid mineral matter',
+            'TRAIN': 'Long vehicle that runs on tracks',
+            
+            // Normal words
+            'SPACE': 'The final frontier explored by astronauts',
             'BRAVE': 'Showing courage in the face of danger',
             'SHINE': 'To emit or reflect bright light',
             'STORM': 'Violent weather with wind and precipitation',
             'QUEST': 'A long search for something important',
             'POWER': 'Strength or energy to do work',
-            'GRACE': 'Elegant movement or divine favor',
             'TRUTH': 'What is real and not false',
             'HONOR': 'High respect and integrity',
             'FAITH': 'Trust and belief without proof',
             'SPARK': 'Small fiery particle or sudden inspiration',
-            'BLAZE': 'Bright flame or intense fire',
             'FROST': 'Ice crystals forming in cold weather',
-            'CATS': 'Furry pets that purr and meow',
-            'DOGS': 'Loyal pets often called mans best friend',
-            'BIRD': 'Flying creature with feathers and wings',
-            'FISH': 'Aquatic animal that swims and breathes underwater',
-            'LOVE': 'Deep affection and care for someone',
-            'GAME': 'Activity played for fun or competition',
-            'PLAY': 'To engage in activities for enjoyment',
-            'TREE': 'Tall plant with woody trunk and branches',
-            'BOOK': 'Written work with pages bound together',
-            'MOON': 'Earths natural satellite in the night sky',
-            'STAR': 'Celestial body that shines in space',
-            'FIRE': 'Hot, bright combustion that burns things',
-            'COMPLEX': 'Consisting of many interconnected parts',
-            'JOURNEY': 'Act of traveling from one place to another',
+            'CRANE': 'Large bird with long neck and legs',
+            'PIANO': 'Musical instrument with black and white keys',
+            'PRISM': 'Transparent object that splits light',
+            'COSMIC': 'Relating to the universe or cosmos',
+            'GALAXY': 'Massive collection of stars and planets',
+            'PORTAL': 'Doorway or entrance to another place',
+            'MYSTIC': 'Person who seeks spiritual mysteries',
+            'CIPHER': 'Secret code or encoded message',
+            'MATRIX': 'Mathematical array or framework',
+            'VECTOR': 'Quantity with direction and magnitude',
+            'PLASMA': 'Fourth state of matter',
+            'PUZZLE': 'Problem requiring thought to solve',
+            'RIDDLE': 'Puzzling question or statement',
+            'SECRET': 'Information kept hidden from others',
+            'WONDER': 'Feeling of amazement and curiosity',
+            'MARVEL': 'Something causing wonder or astonishment',
+            'AURORA': 'Natural light display in polar skies',
+            'PHOTON': 'Particle of light or energy',
+            'BRIDGE': 'Structure spanning a river or valley',
+            'CASTLE': 'Large fortified building',
+            'GARDEN': 'Cultivated area for growing plants',
+            
+            // Hard words
+            'AZURE': 'Bright blue color like a clear sky',
+            'BIJOU': 'Small and elegant jewel',
+            'CABAL': 'Secret group plotting together',
+            'DANDY': 'Man excessively concerned with clothes',
+            'ETHIC': 'Moral principle governing behavior',
+            'FROCK': 'Womans dress or gown',
+            'GUILD': 'Association of craftsmen',
+            'HAVOC': 'Widespread destruction or chaos',
+            'IRATE': 'Extremely angry or furious',
+            'JOUST': 'Medieval combat between knights',
+            'KARMA': 'Spiritual principle of cause and effect',
+            'LEAPT': 'Past tense of leap or jump',
+            'MIRTH': 'Amusement or high spirits',
+            'NYMPH': 'Mythological spirit of nature',
+            'OZONE': 'Form of oxygen in the atmosphere',
+            'PSALM': 'Religious song or poem',
+            'QUARK': 'Fundamental particle of matter',
+            'RELIC': 'Object from the past',
+            'SCYTHE': 'Tool with curved blade for cutting',
+            'THYME': 'Aromatic herb used in cooking',
+            'ULTRA': 'Going beyond normal limits',
+            'VIGOR': 'Physical strength and energy',
+            'WRATH': 'Extreme anger or rage',
+            'XERUS': 'Type of African ground squirrel',
+            'YOUTH': 'Time of being young',
+            'ZESTY': 'Having a fresh energetic quality',
+            'EPOCH': 'Distinctive period in history',
+            'FJORD': 'Narrow inlet between cliffs',
+            'GLYPH': 'Symbolic character or mark',
+            'HYENA': 'Carnivorous mammal known for laughing',
+            
+            // Expert words
+            'ABHOR': 'To regard with disgust',
+            'BERTH': 'Ship sleeping accommodation',
+            'CHAOS': 'Complete disorder and confusion',
+            'DJINN': 'Supernatural being from Arabian folklore',
+            'EPOXY': 'Strong adhesive resin',
+            'GHOUL': 'Evil spirit that robs graves',
+            'HELIX': 'Three-dimensional spiral curve',
+            'INBOX': 'Container for incoming mail',
+            'JAZZY': 'Having characteristics of jazz music',
+            'KNACK': 'Acquired skill or talent',
+            'LYMPH': 'Colorless fluid in the body',
+            'MURKY': 'Dark and gloomy or unclear',
+            'NICHE': 'Specialized segment or role',
+            'OOMPH': 'Energy or enthusiasm',
+            'PLUMP': 'Having rounded, full form',
+            'QUELL': 'To suppress or put an end to',
+            'RHYME': 'Correspondence of sound in words',
+            'SKULK': 'Move stealthily or furtively',
+            'TWERP': 'Silly or annoying person',
+            'ULCER': 'Painful sore on skin or organ',
+            'VERVE': 'Vigor and spirit or enthusiasm',
+            'WHISK': 'Move or take suddenly and quickly',
+            'XEROX': 'To photocopy a document',
+            'YODEL': 'Form of singing with rapid pitch changes',
+            'ZILCH': 'Nothing at all',
+            'ABODE': 'Place of residence or dwelling',
+            'BRAWL': 'Rough or noisy fight',
+            'CRISP': 'Firm, dry and brittle',
+            'DWARF': 'Very small person or thing'
+        };
             'HARMONY': 'Pleasant agreement and balance',
             'BALANCE': 'Equal distribution of weight or elements',
             'DESTINY': 'Predetermined course of events; fate',
@@ -737,10 +844,23 @@ class VibeWordle {
         this.evaluations = [];
         this.revealedPositions.clear();
         
-        // Choose new word based on difficulty
+        // Choose new word based on difficulty and word length
         const wordList = this.wordLists[this.difficulty];
-        this.targetWord = wordList[Math.floor(Math.random() * wordList.length)];
+        
+        // Filter words by current word length
+        const validWords = wordList.filter(word => word.length === this.wordLength);
+        
+        if (validWords.length === 0) {
+            console.error(`No ${this.wordLength}-letter words found for difficulty: ${this.difficulty}`);
+            // Fallback to normal difficulty 5-letter words
+            const fallbackWords = this.wordLists.normal.filter(word => word.length === 5);
+            this.targetWord = fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
+        } else {
+            this.targetWord = validWords[Math.floor(Math.random() * validWords.length)];
+        }
+        
         this.currentHint = this.wordHints[this.targetWord] || 'No hint available for this word.';
+        console.log(`Selected ${this.wordLength}-letter word: ${this.targetWord} from ${validWords.length} valid options`);
         
         // Reset board
         this.createBoard();
@@ -969,7 +1089,8 @@ class VibeWordle {
     }
     
     evaluateGuess(guess) {
-        console.log('Evaluating guess:', guess, 'against target:', this.targetWord);
+        console.log('=== EVALUATING GUESS ===');
+        console.log('Guess:', guess, 'against target:', this.targetWord);
         
         const result = [];
         const targetArray = this.targetWord.split('');
@@ -981,33 +1102,41 @@ class VibeWordle {
             targetLetterCount[letter] = (targetLetterCount[letter] || 0) + 1;
         });
         
+        console.log('Target array:', targetArray);
+        console.log('Guess array:', guessArray);
         console.log('Target letter counts:', targetLetterCount);
+        
+        // Initialize result array
+        for (let i = 0; i < guessArray.length; i++) {
+            result[i] = null;
+        }
         
         // First pass: mark correct letters (green)
         guessArray.forEach((letter, index) => {
             if (letter === targetArray[index]) {
                 result[index] = 'correct';
                 targetLetterCount[letter]--;
-                console.log(`Position ${index}: ${letter} is CORRECT (green)`);
+                console.log(`Position ${index}: ${letter} is CORRECT (green) - remaining count: ${targetLetterCount[letter]}`);
             }
         });
         
         // Second pass: mark present (yellow) and absent (gray) letters
         guessArray.forEach((letter, index) => {
-            if (result[index] === undefined) {
+            if (result[index] === null) {
                 if (targetLetterCount[letter] > 0) {
                     result[index] = 'present';
                     targetLetterCount[letter]--;
-                    console.log(`Position ${index}: ${letter} is PRESENT (yellow)`);
+                    console.log(`Position ${index}: ${letter} is PRESENT (yellow) - remaining count: ${targetLetterCount[letter]}`);
                 } else {
                     result[index] = 'absent';
-                    console.log(`Position ${index}: ${letter} is ABSENT (gray)`);
+                    console.log(`Position ${index}: ${letter} is ABSENT (gray) - count was: ${targetLetterCount[letter]}`);
                 }
             }
         });
         
         console.log('Final evaluation result:', result);
-        console.log('Target word was:', this.targetWord);
+        console.log('Final letter counts:', targetLetterCount);
+        console.log('========================');
         return result;
     }
     
@@ -1707,6 +1836,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Evaluations:', window.vibeWordleGame.evaluations);
             console.log('Current row:', window.vibeWordleGame.currentRow);
             console.log('Game state:', window.vibeWordleGame.gameState);
+        };
+        window.getCurrentTarget = () => {
+            alert('Current target word: ' + window.vibeWordleGame.targetWord);
+            return window.vibeWordleGame.targetWord;
         };
         
         // Update dictionary status after a short delay to ensure elements are ready

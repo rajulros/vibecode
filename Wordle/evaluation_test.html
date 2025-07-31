@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wordle Evaluation Test</title>
+</head>
+<body>
+    <h1>Wordle Evaluation Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        function evaluateGuess(guess, targetWord) {
+            console.log('=== EVALUATING GUESS ===');
+            console.log('Guess:', guess, 'against target:', targetWord);
+            
+            const result = [];
+            const targetArray = targetWord.split('');
+            const guessArray = guess.split('');
+            const targetLetterCount = {};
+            
+            // Count letters in target word
+            targetArray.forEach(letter => {
+                targetLetterCount[letter] = (targetLetterCount[letter] || 0) + 1;
+            });
+            
+            console.log('Target array:', targetArray);
+            console.log('Guess array:', guessArray);
+            console.log('Target letter counts:', targetLetterCount);
+            
+            // Initialize result array
+            for (let i = 0; i < guessArray.length; i++) {
+                result[i] = null;
+            }
+            
+            // First pass: mark correct letters (green)
+            guessArray.forEach((letter, index) => {
+                if (letter === targetArray[index]) {
+                    result[index] = 'correct';
+                    targetLetterCount[letter]--;
+                    console.log(`Position ${index}: ${letter} is CORRECT (green) - remaining count: ${targetLetterCount[letter]}`);
+                }
+            });
+            
+            // Second pass: mark present (yellow) and absent (gray) letters
+            guessArray.forEach((letter, index) => {
+                if (result[index] === null) {
+                    if (targetLetterCount[letter] > 0) {
+                        result[index] = 'present';
+                        targetLetterCount[letter]--;
+                        console.log(`Position ${index}: ${letter} is PRESENT (yellow) - remaining count: ${targetLetterCount[letter]}`);
+                    } else {
+                        result[index] = 'absent';
+                        console.log(`Position ${index}: ${letter} is ABSENT (gray) - count was: ${targetLetterCount[letter]}`);
+                    }
+                }
+            });
+            
+            console.log('Final evaluation result:', result);
+            console.log('Final letter counts:', targetLetterCount);
+            console.log('========================');
+            return result;
+        }
+        
+        function testFromImage() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Testing the sequence from your image:</h2>';
+            
+            // Based on your image, let's test what the target word might be
+            // Looking at the pattern, it seems like the target could be "SCORE" or "SPACE"
+            
+            const possibleTargets = ['SCORE', 'SPACE', 'SCARE'];
+            const guesses = ['CRANE', 'GHOUL', 'ERASE', 'SCARE', 'SACRE', 'SUCRE'];
+            
+            possibleTargets.forEach(target => {
+                results.innerHTML += `<h3>Testing target word: ${target}</h3>`;
+                
+                guesses.forEach(guess => {
+                    const evaluation = evaluateGuess(guess, target);
+                    const coloredResult = evaluation.map(result => {
+                        if (result === 'correct') return '🟩';
+                        if (result === 'present') return '🟨';
+                        return '⬛';
+                    }).join('');
+                    
+                    results.innerHTML += `<p><strong>${guess}</strong>: ${coloredResult} (${evaluation.join(', ')})</p>`;
+                });
+                
+                results.innerHTML += '<hr>';
+            });
+        }
+        
+        // Run test when page loads
+        window.onload = testFromImage;
+    </script>
+</body>
+</html>
