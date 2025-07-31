@@ -206,8 +206,13 @@ class VibeWordle {
             'DWARF': 'Very small person or thing'
         };
         
-        // Initialize auto word updater
-        this.autoUpdater = new AutoWordUpdater();
+        // Initialize auto word updater (with error handling)
+        try {
+            this.autoUpdater = new AutoWordUpdater();
+        } catch (error) {
+            console.warn('AutoWordUpdater not available, using static words only');
+            this.autoUpdater = null;
+        }
         
         // Start with static dictionary, then update asynchronously
         this.dictionary = this.createStaticDictionary();
@@ -215,11 +220,18 @@ class VibeWordle {
         // Initialize the game
         this.init();
         
-        // Initialize dictionary with auto-updater asynchronously
-        this.initializeDictionary();
+        // Initialize dictionary with auto-updater asynchronously (if available)
+        if (this.autoUpdater) {
+            this.initializeDictionary();
+        }
     }
     
     async initializeDictionary() {
+        if (!this.autoUpdater) {
+            console.log('📚 Using static dictionary only');
+            return;
+        }
+        
         try {
             console.log('🔄 Initializing dictionary with auto-updater...');
             
@@ -248,19 +260,33 @@ class VibeWordle {
             console.log('📚 Using fallback static dictionary');
         }
         
-        // Start background auto-updates
-        this.autoUpdater.startAutoUpdates();
+        // Start background auto-updates (if available)
+        if (this.autoUpdater) {
+            try {
+                this.autoUpdater.startAutoUpdates();
+            } catch (error) {
+                console.warn('Could not start auto updates:', error);
+            }
+        }
     }
     
     showUpdateStatus() {
-        const status = this.autoUpdater.getUpdateStatus();
-        if (status && status.status === 'success') {
-            const timeSince = Date.now() - status.timestamp;
-            const hours = Math.floor(timeSince / (1000 * 60 * 60));
-            
-            if (hours < 1) {
-                this.showMessage(`📚 Dictionary updated with ${status.wordCount} words!`, 3000);
+        if (!this.autoUpdater) {
+            return;
+        }
+        
+        try {
+            const status = this.autoUpdater.getUpdateStatus();
+            if (status && status.status === 'success') {
+                const timeSince = Date.now() - status.timestamp;
+                const hours = Math.floor(timeSince / (1000 * 60 * 60));
+                
+                if (hours < 1) {
+                    this.showMessage(`📚 Dictionary updated with ${status.wordCount} words!`, 3000);
+                }
             }
+        } catch (error) {
+            console.warn('Could not show update status:', error);
         }
     }
     
@@ -1714,8 +1740,19 @@ class VibeWordle {
         
         if (!statusElement || !refreshBtn) return;
         
-        const status = this.autoUpdater.getUpdateStatus();
-        const lastUpdate = localStorage.getItem('vibewordle_last_update');
+        if (!this.autoUpdater) {
+            statusElement.textContent = 'Using static word list';
+            return;
+        }
+        
+        try {
+            const status = this.autoUpdater.getUpdateStatus();
+            const lastUpdate = localStorage.getItem('vibewordle_last_update');
+        } catch (error) {
+            statusElement.textContent = 'Dictionary status unavailable';
+            console.warn('Could not get dictionary status:', error);
+            return;
+        }
         
         if (status) {
             const timeSince = Date.now() - status.timestamp;
@@ -1768,6 +1805,11 @@ class VibeWordle {
     async refreshDictionary() {
         const refreshBtn = document.getElementById('refresh-dictionary-btn');
         const statusElement = document.getElementById('dictionary-status');
+        
+        if (!this.autoUpdater) {
+            this.showMessage('Dictionary refresh not available in static mode', 2000);
+            return;
+        }
         
         try {
             refreshBtn.disabled = true;
