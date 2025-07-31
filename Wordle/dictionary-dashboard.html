@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#6366f1">
+    <title>VibeWordle Dictionary Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .dashboard {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            color: #6366f1;
+            margin-bottom: 10px;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+        }
+        
+        .header p {
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            color: #64748b;
+            margin: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .stat-card:hover {
+            border-color: #6366f1;
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: bold;
+            color: #6366f1;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            min-height: 44px; /* Touch-friendly minimum */
+        }
+        
+        .btn:hover {
+            background: #5b5ade;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .logs {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.7rem, 2vw, 0.8125rem);
+            line-height: 1.4;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .log-timestamp {
+            color: #64748b;
+        }
+        
+        .log-success { color: #22c55e; }
+        .log-error { color: #ef4444; }
+        .log-warning { color: #f59e0b; }
+        .log-info { color: #06b6d4; }
+        
+        .word-sample {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .word-sample h4 {
+            margin-bottom: 10px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+        
+        .word-list {
+            font-family: monospace;
+            font-size: clamp(0.7rem, 2vw, 0.75rem);
+            line-height: 1.6;
+            columns: auto;
+            column-width: 60px;
+            column-gap: 15px;
+            word-break: break-all;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+        
+        .status-online { background: #22c55e; }
+        .status-offline { background: #ef4444; }
+        .status-updating { background: #f59e0b; }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .dashboard {
+                padding: 15px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+                min-height: 70px;
+            }
+            
+            .actions {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+            
+            .btn {
+                padding: 10px 12px;
+                font-size: 0.75rem;
+                gap: 4px;
+            }
+            
+            .logs {
+                max-height: 200px;
+                padding: 12px;
+                font-size: 0.7rem;
+            }
+            
+            .word-sample {
+                padding: 12px;
+                max-height: 150px;
+            }
+            
+            .word-list {
+                column-width: 50px;
+                column-gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .dashboard {
+                padding: 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .actions {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            
+            .btn {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+                min-height: 40px;
+            }
+            
+            .logs {
+                max-height: 150px;
+                padding: 10px;
+                font-size: 0.65rem;
+            }
+            
+            .word-list {
+                columns: 2;
+                column-width: auto;
+            }
+            
+            .stat-value {
+                font-size: 1.2rem;
+            }
+            
+            .stat-label {
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* Touch improvements */
+        @media (hover: none) {
+            .stat-card:hover {
+                transform: none;
+                border-color: transparent;
+            }
+            
+            .btn:hover {
+                transform: none;
+            }
+            
+            .btn:active {
+                background: #5b5ade;
+                transform: scale(0.98);
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .status-indicator {
+                width: 12px;
+                height: 12px;
+            }
+        }
+        
+        /* Landscape phone orientation */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .actions {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .logs {
+                max-height: 120px;
+            }
+            
+            .word-sample {
+                max-height: 100px;
+            }
+        }
+        
+        /* Dark mode support for mobile devices */
+        @media (prefers-color-scheme: dark) {
+            .dashboard {
+                background: #1e293b;
+                color: #e2e8f0;
+            }
+            
+            .stat-card {
+                background: linear-gradient(145deg, #334155, #475569);
+                color: #e2e8f0;
+            }
+            
+            .stat-label {
+                color: #94a3b8;
+            }
+            
+            .word-sample {
+                background: #334155;
+                color: #e2e8f0;
+            }
+            
+            .logs {
+                background: #0f172a;
+            }
+        }
+        
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>📚 VibeWordle Dictionary Dashboard</h1>
+            <p>Monitor and manage your automatic word list updates</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-words">-</div>
+                <div class="stat-label">Total Words</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="last-update">-</div>
+                <div class="stat-label">Last Updated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="update-status">
+                    <span class="status-indicator" id="status-indicator"></span>
+                    <span id="status-text">Checking...</span>
+                </div>
+                <div class="stat-label">Status</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="next-update">-</div>
+                <div class="stat-label">Next Auto Update</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn" onclick="checkStatus()">
+                🔍 Check Status
+            </button>
+            <button class="btn" onclick="forceUpdate()" id="force-update-btn">
+                🔄 Force Update
+            </button>
+            <button class="btn" onclick="testValidation()">
+                ✅ Test Validation
+            </button>
+            <button class="btn" onclick="clearCache()">
+                🗑️ Clear Cache
+            </button>
+            <button class="btn" onclick="exportWords()">
+                💾 Export Words
+            </button>
+        </div>
+        
+        <div class="logs" id="logs">
+            <div class="log-entry">
+                <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
+                <span class="log-info">Dashboard initialized. Loading word updater...</span>
+            </div>
+        </div>
+        
+        <div class="word-sample" id="word-sample" style="display: none;">
+            <h4>Sample Words (first 100):</h4>
+            <div class="word-list" id="word-list"></div>
+        </div>
+    </div>
+
+    <script src="auto-word-updater.js"></script>
+    <script>
+        let updater = null;
+        let currentWords = [];
+
+        // Initialize the dashboard
+        async function initDashboard() {
+            log('Initializing word updater...', 'info');
+            
+            try {
+                updater = new AutoWordUpdater();
+                log('✅ Word updater initialized successfully', 'success');
+                
+                await checkStatus();
+                
+                // Auto-refresh every 30 seconds
+                setInterval(checkStatus, 30000);
+                
+            } catch (error) {
+                log(`❌ Failed to initialize: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkStatus() {
+            if (!updater) return;
+            
+            try {
+                log('🔍 Checking dictionary status...', 'info');
+                
+                // Get current words
+                currentWords = await updater.getWordList();
+                
+                // Update stats
+                document.getElementById('total-words').textContent = currentWords.length.toLocaleString();
+                
+                // Get status
+                const status = updater.getUpdateStatus();
+                const lastUpdate = localStorage.getItem('vibewordle_last_update');
+                
+                if (lastUpdate) {
+                    const updateTime = new Date(parseInt(lastUpdate));
+                    document.getElementById('last-update').textContent = updateTime.toLocaleDateString();
+                } else {
+                    document.getElementById('last-update').textContent = 'Never';
+                }
+                
+                // Update status indicator
+                const statusIndicator = document.getElementById('status-indicator');
+                const statusText = document.getElementById('status-text');
+                
+                if (status) {
+                    switch (status.status) {
+                        case 'success':
+                            statusIndicator.className = 'status-indicator status-online';
+                            statusText.textContent = 'Online';
+                            break;
+                        case 'updating':
+                            statusIndicator.className = 'status-indicator status-updating';
+                            statusText.textContent = 'Updating';
+                            break;
+                        case 'error':
+                            statusIndicator.className = 'status-indicator status-offline';
+                            statusText.textContent = 'Error';
+                            break;
+                        default:
+                            statusIndicator.className = 'status-indicator status-online';
+                            statusText.textContent = 'Ready';
+                    }
+                }
+                
+                // Calculate next update
+                if (lastUpdate) {
+                    const nextUpdate = new Date(parseInt(lastUpdate) + 24 * 60 * 60 * 1000);
+                    const hoursUntil = Math.max(0, Math.ceil((nextUpdate - Date.now()) / (1000 * 60 * 60)));
+                    document.getElementById('next-update').textContent = `${hoursUntil}h`;
+                } else {
+                    document.getElementById('next-update').textContent = 'Soon';
+                }
+                
+                log(`✅ Status check complete: ${currentWords.length} words available`, 'success');
+                
+                // Show word sample
+                showWordSample();
+                
+            } catch (error) {
+                log(`❌ Status check failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function forceUpdate() {
+            if (!updater) return;
+            
+            const btn = document.getElementById('force-update-btn');
+            const originalText = btn.textContent;
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = '🔄 Updating...';
+                
+                log('🔄 Starting forced dictionary update...', 'info');
+                
+                const newWords = await updater.forceUpdate();
+                currentWords = newWords;
+                
+                log(`✅ Dictionary updated successfully! ${newWords.length} words available`, 'success');
+                
+                await checkStatus();
+                
+            } catch (error) {
+                log(`❌ Forced update failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        async function testValidation() {
+            if (!updater) return;
+            
+            log('🧪 Testing word validation...', 'info');
+            
+            const testWords = ['ABOUT', 'HOUSE', 'WORLD', 'CRANE', 'TIGER'];
+            
+            for (const word of testWords) {
+                try {
+                    const isValid = await updater.validateWord(word);
+                    log(`${word}: ${isValid ? '✅ Valid' : '❌ Invalid'}`, isValid ? 'success' : 'warning');
+                } catch (error) {
+                    log(`${word}: ⚠️ Validation failed`, 'warning');
+                }
+                
+                // Small delay to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            log('🧪 Validation test complete', 'info');
+        }
+
+        function clearCache() {
+            try {
+                localStorage.removeItem('vibewordle_comprehensive_words');
+                localStorage.removeItem('vibewordle_last_update');
+                localStorage.removeItem('vibewordle_update_status');
+                
+                log('🗑️ Cache cleared successfully', 'success');
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+                
+            } catch (error) {
+                log(`❌ Failed to clear cache: ${error.message}`, 'error');
+            }
+        }
+
+        function exportWords() {
+            if (currentWords.length === 0) {
+                log('❌ No words to export', 'error');
+                return;
+            }
+            
+            try {
+                const content = currentWords.join('\\n');
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `vibewordle-dictionary-${Date.now()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                log(`💾 Exported ${currentWords.length} words to file`, 'success');
+                
+            } catch (error) {
+                log(`❌ Export failed: ${error.message}`, 'error');
+            }
+        }
+
+        function showWordSample() {
+            if (currentWords.length === 0) return;
+            
+            const sampleDiv = document.getElementById('word-sample');
+            const wordListDiv = document.getElementById('word-list');
+            
+            const sample = currentWords.slice(0, 100);
+            wordListDiv.textContent = sample.join(', ');
+            
+            sampleDiv.style.display = 'block';
+        }
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-${type}">${message}</span>
+            `;
+            
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            
+            // Limit log entries
+            const entries = logsDiv.children;
+            if (entries.length > 100) {
+                logsDiv.removeChild(entries[0]);
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initDashboard);
+    </script>
+</body>
+</html>

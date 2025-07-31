@@ -112,14 +112,65 @@ class VibeWordle {
             'SERENITY': 'State of being calm and peaceful'
         };
         
-        // Initialize comprehensive dictionary
-        this.dictionary = this.createDictionary();
+        // Initialize auto word updater
+        this.autoUpdater = new AutoWordUpdater();
+        
+        // Start with static dictionary, then update asynchronously
+        this.dictionary = this.createStaticDictionary();
         
         // Initialize the game
         this.init();
+        
+        // Initialize dictionary with auto-updater asynchronously
+        this.initializeDictionary();
     }
     
-    createDictionary() {
+    async initializeDictionary() {
+        try {
+            console.log('🔄 Initializing dictionary with auto-updater...');
+            
+            // Get fresh word list (will check for daily updates automatically)
+            const words = await this.autoUpdater.getWordList();
+            
+            // Create dictionary structure
+            this.dictionary = {
+                all: new Set(words),
+                5: words.filter(word => word.length === 5),
+                4: words.filter(word => word.length === 4),
+                6: words.filter(word => word.length === 6),
+                7: words.filter(word => word.length === 7)
+            };
+            
+            console.log(`✅ Dictionary initialized with ${words.length} words`);
+            
+            // Show update status to user
+            this.showUpdateStatus();
+            
+        } catch (error) {
+            console.error('❌ Failed to initialize dictionary:', error);
+            
+            // Fallback to static dictionary
+            this.dictionary = this.createStaticDictionary();
+            console.log('📚 Using fallback static dictionary');
+        }
+        
+        // Start background auto-updates
+        this.autoUpdater.startAutoUpdates();
+    }
+    
+    showUpdateStatus() {
+        const status = this.autoUpdater.getUpdateStatus();
+        if (status && status.status === 'success') {
+            const timeSince = Date.now() - status.timestamp;
+            const hours = Math.floor(timeSince / (1000 * 60 * 60));
+            
+            if (hours < 1) {
+                this.showMessage(`📚 Dictionary updated with ${status.wordCount} words!`, 3000);
+            }
+        }
+    }
+    
+    createStaticDictionary() {
         // Comprehensive English word dictionary organized by length
         const dictionary = {
             4: [
@@ -1488,6 +1539,104 @@ class VibeWordle {
         
         return result;
     }
+    
+    // Dictionary management methods
+    updateDictionaryStatus() {
+        const statusElement = document.getElementById('dictionary-status');
+        const refreshBtn = document.getElementById('refresh-dictionary-btn');
+        
+        if (!statusElement || !refreshBtn) return;
+        
+        const status = this.autoUpdater.getUpdateStatus();
+        const lastUpdate = localStorage.getItem('vibewordle_last_update');
+        
+        if (status) {
+            const timeSince = Date.now() - status.timestamp;
+            const hours = Math.floor(timeSince / (1000 * 60 * 60));
+            const minutes = Math.floor((timeSince % (1000 * 60 * 60)) / (1000 * 60));
+            
+            let statusText = '';
+            let statusClass = '';
+            
+            switch (status.status) {
+                case 'success':
+                    if (hours < 1) {
+                        statusText = `✅ Updated ${minutes}m ago (${status.wordCount} words)`;
+                    } else if (hours < 24) {
+                        statusText = `✅ Updated ${hours}h ago (${status.wordCount} words)`;
+                    } else {
+                        statusText = `⚠️ Last updated ${Math.floor(hours/24)}d ago`;
+                        statusClass = 'status-warning';
+                    }
+                    statusClass = statusClass || 'status-success';
+                    break;
+                    
+                case 'updating':
+                    statusText = '🔄 Updating dictionary...';
+                    statusClass = 'status-info';
+                    refreshBtn.disabled = true;
+                    break;
+                    
+                case 'error':
+                    statusText = `❌ Update failed: ${status.message}`;
+                    statusClass = 'status-error';
+                    break;
+                    
+                default:
+                    statusText = '📚 Using offline dictionary';
+                    statusClass = 'status-info';
+            }
+            
+            statusElement.textContent = statusText;
+            statusElement.className = statusClass;
+        } else {
+            statusElement.textContent = '📚 Dictionary ready';
+            statusElement.className = 'status-info';
+        }
+        
+        // Setup refresh button
+        refreshBtn.onclick = () => this.refreshDictionary();
+    }
+    
+    async refreshDictionary() {
+        const refreshBtn = document.getElementById('refresh-dictionary-btn');
+        const statusElement = document.getElementById('dictionary-status');
+        
+        try {
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 Updating...';
+            statusElement.textContent = '🔄 Fetching fresh words...';
+            statusElement.className = 'status-info';
+            
+            // Force update
+            const newWords = await this.autoUpdater.forceUpdate();
+            
+            // Update dictionary
+            this.dictionary = {
+                all: new Set(newWords),
+                5: newWords.filter(word => word.length === 5),
+                4: newWords.filter(word => word.length === 4),
+                6: newWords.filter(word => word.length === 6),
+                7: newWords.filter(word => word.length === 7)
+            };
+            
+            // Show success message
+            this.showMessage(`📚 Dictionary updated! ${newWords.length} words available`, 3000);
+            
+            // Update status display
+            this.updateDictionaryStatus();
+            
+        } catch (error) {
+            console.error('Manual dictionary refresh failed:', error);
+            this.showMessage('❌ Dictionary update failed. Using cached words.', 3000);
+            
+            statusElement.textContent = `❌ Update failed: ${error.message}`;
+            statusElement.className = 'status-error';
+        } finally {
+            refreshBtn.disabled = false;
+            refreshBtn.textContent = '🔄 Refresh Now';
+        }
+    }
 }
 
 // Initialize the game when the page loads
@@ -1496,6 +1645,19 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         window.vibeWordleGame = new VibeWordle();
         console.log('VibeWordle game instance created successfully');
+        
+        // Update dictionary status after a short delay to ensure elements are ready
+        setTimeout(() => {
+            if (window.vibeWordleGame && window.vibeWordleGame.updateDictionaryStatus) {
+                window.vibeWordleGame.updateDictionaryStatus();
+                
+                // Update status every 5 minutes
+                setInterval(() => {
+                    window.vibeWordleGame.updateDictionaryStatus();
+                }, 5 * 60 * 1000);
+            }
+        }, 1000);
+        
     } catch (error) {
         console.error('Error initializing VibeWordle:', error);
     }

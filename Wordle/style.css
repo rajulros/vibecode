@@ -86,6 +86,8 @@ body {
     background: var(--color-tone-1);
     box-shadow: var(--shadow-xl);
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header */
@@ -191,7 +193,9 @@ body {
     padding: var(--gap-lg);
     display: flex;
     flex-direction: column;
-    gap: var(--gap-xl);
+    gap: var(--gap-lg);
+    flex: 1;
+    justify-content: space-between;
     min-height: calc(100vh - 200px);
 }
 
@@ -383,7 +387,7 @@ body {
     flex-direction: column;
     gap: var(--gap-sm);
     align-items: center;
-    margin-top: auto;
+    padding: var(--gap-md) 0;
 }
 
 .keyboard-row {
@@ -795,28 +799,112 @@ body {
 @media (max-width: 768px) {
     .game-container {
         max-width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh; /* Use dynamic viewport height when available */
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
     }
     
     .header {
         padding: var(--gap-sm) var(--gap-md);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        flex-shrink: 0;
     }
     
     .title {
-        font-size: 1.5rem;
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+    }
+    
+    .subtitle {
+        font-size: clamp(0.7rem, 2.5vw, 0.8rem);
     }
     
     .game-info {
         gap: var(--gap-md);
+        padding: var(--gap-sm) var(--gap-md);
+        flex-wrap: wrap;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .info-item {
+        min-width: 70px;
+        font-size: clamp(0.7rem, 2vw, 0.8rem);
+    }
+    
+    .info-value {
+        font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+    
+    .game-main {
+        padding: var(--gap-sm) var(--gap-md) var(--gap-xs) var(--gap-md);
+        gap: var(--gap-sm);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0; /* Allow flexbox to work properly */
+        overflow: hidden; /* Prevent content from spilling */
     }
     
     .tile {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+        width: clamp(45px, 12vw, 55px);
+        height: clamp(45px, 12vw, 55px);
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        border-width: 2px;
+    }
+    
+    .game-board {
+        gap: var(--gap-xs);
+        margin: 0;
+        flex-shrink: 0;
     }
     
     .powerups-container {
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--gap-sm);
+        padding: 0;
+        margin: var(--gap-sm) 0;
+        flex-shrink: 0;
+    }
+    
+    .powerup-item {
+        padding: var(--gap-sm);
+        font-size: 0.8rem;
+    }
+    
+    .powerup-count {
+        font-size: 0.9rem;
+        min-width: 24px;
+        height: 24px;
+    }
+    
+    .keyboard {
+        padding: var(--gap-sm) 0 var(--gap-md) 0;
+        gap: var(--gap-xs);
+        flex-shrink: 0;
+    }
+    
+    .key-row {
+        gap: var(--gap-xs);
+    }
+    
+    .key {
+        height: 48px;
+        min-width: clamp(28px, 8vw, 38px);
+        font-size: clamp(0.8rem, 2.5vw, 1rem);
+        border-radius: 6px;
+        /* Ensure touch targets are at least 44px */
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+    
+    .key.wide {
+        min-width: clamp(50px, 15vw, 65px);
+        font-size: clamp(0.6rem, 2vw, 0.75rem);
     }
     
     .stats-grid {
@@ -831,21 +919,50 @@ body {
     .modal-content {
         width: 95%;
         margin: 0.5rem;
+        max-height: 90vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
-    .key {
-        height: 48px;
-        min-width: 35px;
-        font-size: 1rem;
+    /* Improve button touch targets */
+    .icon-btn {
+        min-width: 44px;
+        min-height: 44px;
+        touch-action: manipulation;
     }
     
-    .key.wide {
-        min-width: 55px;
-        font-size: 0.7rem;
+    .setting-item {
+        padding: var(--gap-sm) 0;
+    }
+    
+    .dictionary-status {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--gap-xs);
+    }
+    
+    .refresh-btn {
+        width: 100%;
+        min-height: 44px;
+        font-size: 0.9rem;
+    }
+    
+    /* Mobile hint positioning */
+    .hint {
+        position: fixed;
+        bottom: 100px; /* Position above keyboard */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 150;
+        max-width: 90%;
     }
 }
 
 @media (max-width: 480px) {
+    .header {
+        padding: var(--gap-xs) var(--gap-sm);
+    }
+    
     .difficulty-indicator {
         display: none;
     }
@@ -854,9 +971,306 @@ body {
         flex-wrap: wrap;
         justify-content: center;
         gap: var(--gap-sm);
+        padding: var(--gap-xs) var(--gap-sm);
     }
     
     .info-item {
         min-width: 60px;
+        font-size: 0.7rem;
     }
+    
+    .info-value {
+        font-size: 1rem;
+    }
+    
+    .game-main {
+        padding: var(--gap-xs) var(--gap-sm);
+        gap: var(--gap-sm);
+    }
+    
+    .tile {
+        width: clamp(40px, 11vw, 50px);
+        height: clamp(40px, 11vw, 50px);
+        font-size: clamp(1rem, 3.5vw, 1.5rem);
+    }
+    
+    .game-board {
+        gap: 2px;
+    }
+    
+    .powerups-container {
+        gap: var(--gap-xs);
+        margin: var(--gap-xs) 0;
+    }
+    
+    .powerup-item {
+        padding: var(--gap-xs);
+        font-size: 0.7rem;
+    }
+    
+    .powerup-count {
+        font-size: 0.8rem;
+        min-width: 20px;
+        height: 20px;
+    }
+    
+    .keyboard {
+        padding: var(--gap-xs) 0 var(--gap-sm) 0;
+        gap: 2px;
+    }
+    
+    .key-row {
+        gap: 2px;
+    }
+    
+    .key {
+        height: 42px;
+        min-width: clamp(25px, 7vw, 32px);
+        font-size: clamp(0.7rem, 2vw, 0.9rem);
+        min-height: 40px;
+    }
+    
+    .key.wide {
+        min-width: clamp(45px, 13vw, 55px);
+        font-size: clamp(0.55rem, 1.8vw, 0.65rem);
+    }
+    
+    .modal-content {
+        width: 98%;
+        margin: 0.25rem;
+        padding: var(--gap-sm);
+    }
+    
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .setting-item label {
+        font-size: 0.9rem;
+    }
+    
+    .toggle-label {
+        font-size: 0.8rem;
+    }
+    
+    /* Make hint more prominent on small screens */
+    .hint {
+        bottom: 80px;
+        padding: var(--gap-sm);
+        font-size: 0.9rem;
+        max-width: 95%;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .game-container {
+        max-height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .header {
+        padding: var(--gap-xs) var(--gap-md);
+        flex-shrink: 0;
+    }
+    
+    .game-info {
+        padding: var(--gap-xs) var(--gap-md);
+        flex-shrink: 0;
+    }
+    
+    .game-main {
+        padding: var(--gap-xs) var(--gap-md);
+        gap: var(--gap-xs);
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+    
+    .game-board {
+        flex-shrink: 0;
+    }
+    
+    .tile {
+        width: clamp(30px, 6vw, 40px);
+        height: clamp(30px, 6vw, 40px);
+        font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+    }
+    
+    .powerups-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--gap-xs);
+        margin: var(--gap-xs) 0;
+        flex-shrink: 0;
+    }
+    
+    .powerup-item {
+        padding: var(--gap-xs);
+        font-size: 0.7rem;
+    }
+    
+    .keyboard {
+        padding: var(--gap-xs) 0;
+        gap: 2px;
+        flex-shrink: 0;
+    }
+    
+    .key-row {
+        gap: 2px;
+    }
+    
+    .key {
+        height: 32px;
+        min-height: 32px;
+        min-width: clamp(20px, 5vw, 28px);
+        font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+    }
+    
+    .key.wide {
+        min-width: clamp(35px, 10vw, 45px);
+        font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+    }
+    
+    .hint {
+        bottom: 50px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .tile:hover,
+    .key:hover,
+    .powerup-item:hover,
+    .icon-btn:hover {
+        transform: none;
+        box-shadow: inherit;
+    }
+    
+    /* Improve touch feedback */
+    .tile:active,
+    .key:active,
+    .powerup-item:active,
+    .icon-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Ensure touch targets meet accessibility guidelines */
+    .key,
+    .icon-btn,
+    .powerup-item,
+    .refresh-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .tile {
+        border-width: 1px;
+    }
+    
+    .key {
+        border-width: 1px;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .tile,
+    .key,
+    .powerup-item,
+    .modal,
+    .flip,
+    .reveal,
+    .shake {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Dark mode for mobile devices */
+@media (prefers-color-scheme: dark) {
+    .game-container {
+        background: var(--color-tone-2);
+    }
+}
+
+/* Dictionary Update Styles */
+.setting-section {
+    margin: 20px 0;
+    padding: 15px 0;
+    border-top: 1px solid var(--color-tone-3);
+}
+
+.setting-section h4 {
+    color: var(--color-tone-6);
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dictionary-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+#dictionary-status {
+    font-size: 13px;
+    color: var(--color-tone-5);
+    flex: 1;
+}
+
+.refresh-btn {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all var(--animation-fast);
+    white-space: nowrap;
+}
+
+.refresh-btn:hover {
+    background: var(--color-secondary);
+    transform: translateY(-1px);
+}
+
+.refresh-btn:disabled {
+    background: var(--color-tone-4);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.setting-description {
+    font-size: 11px;
+    color: var(--color-tone-5);
+    font-style: italic;
+}
+
+/* Dictionary Status Indicators */
+.status-success {
+    color: var(--color-success) !important;
+}
+
+.status-warning {
+    color: var(--color-warning) !important;
+}
+
+.status-error {
+    color: var(--color-error) !important;
+}
+
+.status-info {
+    color: var(--color-info) !important;
 }

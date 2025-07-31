@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#6366f1">
     <title>VibeWordle - Enhanced Word Game</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -249,6 +253,18 @@
                             <input type="checkbox" id="animation-toggle" checked>
                             <span class="toggle-label">Enable tile animations</span>
                         </div>
+                        
+                        <!-- Dictionary Update Section -->
+                        <div class="setting-section">
+                            <h4>📚 Dictionary Updates</h4>
+                            <div class="setting-item">
+                                <div class="dictionary-status">
+                                    <span id="dictionary-status">Checking...</span>
+                                    <button id="refresh-dictionary-btn" class="refresh-btn">🔄 Refresh Now</button>
+                                </div>
+                                <small class="setting-description">Dictionary updates automatically every 24 hours</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="settings-group">
                         <h3>Accessibility</h3>
@@ -320,6 +336,7 @@
         </div>
     </div>
 
+    <script src="auto-word-updater.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
