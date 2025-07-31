@@ -205,19 +205,6 @@ class VibeWordle {
             'CRISP': 'Firm, dry and brittle',
             'DWARF': 'Very small person or thing'
         };
-            'HARMONY': 'Pleasant agreement and balance',
-            'BALANCE': 'Equal distribution of weight or elements',
-            'DESTINY': 'Predetermined course of events; fate',
-            'FREEDOM': 'State of being free from oppression',
-            'JUSTICE': 'Fair treatment according to law',
-            'WISDOM': 'Deep understanding and good judgment',
-            'COURAGE': 'Bravery in facing fear or difficulty',
-            'MYSTERY': 'Something difficult to understand or explain',
-            'SYMPHONY': 'Large musical composition for orchestra',
-            'MYSTICAL': 'Having spiritual or supernatural significance',
-            'ETHEREAL': 'Extremely delicate and otherworldly',
-            'SERENITY': 'State of being calm and peaceful'
-        };
         
         // Initialize auto word updater
         this.autoUpdater = new AutoWordUpdater();
