@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeWordle - Enhanced Word Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Clear+Sans:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="icon-btn" id="menu-btn">
+                    <span class="hamburger">☰</span>
+                </button>
+            </div>
+            <div class="header-center">
+                <h1 class="title">VibeWordle</h1>
+                <div class="subtitle">Enhanced Word Challenge</div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="stats-btn">
+                    <span class="icon">📊</span>
+                </button>
+                <button class="icon-btn" id="settings-btn">
+                    <span class="icon">⚙️</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Game Status Bar -->
+        <div class="status-bar">
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="label">Level:</span>
+                    <span class="value" id="current-level">1</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Score:</span>
+                    <span class="value" id="current-score">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Streak:</span>
+                    <span class="value" id="current-streak">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Time:</span>
+                    <span class="value" id="timer">--:--</span>
+                </div>
+            </div>
+            <div class="difficulty-indicator">
+                <span class="difficulty-label">Difficulty:</span>
+                <span class="difficulty-value" id="difficulty-level">Normal</span>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Word Grid -->
+            <div class="game-board" id="game-board">
+                <!-- Rows will be dynamically generated -->
+            </div>
+
+            <!-- Current Word Display -->
+            <div class="current-word-display">
+                <div class="word-hint" id="word-hint">
+                    <span class="hint-label">💡 Hint:</span>
+                    <span class="hint-text" id="hint-text">Start typing your guess...</span>
+                </div>
+            </div>
+
+            <!-- Power-ups -->
+            <div class="powerups-section">
+                <div class="powerups-title">Power-ups</div>
+                <div class="powerups-container">
+                    <button class="powerup-btn" id="hint-powerup" data-powerup="hint">
+                        <span class="powerup-icon">💡</span>
+                        <span class="powerup-name">Hint</span>
+                        <span class="powerup-count" id="hint-count">3</span>
+                    </button>
+                    <button class="powerup-btn" id="reveal-powerup" data-powerup="reveal">
+                        <span class="powerup-icon">🔍</span>
+                        <span class="powerup-name">Reveal</span>
+                        <span class="powerup-count" id="reveal-count">2</span>
+                    </button>
+                    <button class="powerup-btn" id="shuffle-powerup" data-powerup="shuffle">
+                        <span class="powerup-icon">🔄</span>
+                        <span class="powerup-name">Shuffle</span>
+                        <span class="powerup-count" id="shuffle-count">2</span>
+                    </button>
+                    <button class="powerup-btn" id="time-powerup" data-powerup="time">
+                        <span class="powerup-icon">⏰</span>
+                        <span class="powerup-name">+Time</span>
+                        <span class="powerup-count" id="time-count">1</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Virtual Keyboard -->
+            <div class="keyboard" id="keyboard">
+                <!-- Keyboard will be dynamically generated -->
+            </div>
+        </main>
+
+        <!-- Modals -->
+        <!-- Game Over Modal -->
+        <div class="modal" id="game-over-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="game-over-title">Congratulations! 🎉</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="result-stats">
+                        <div class="result-item">
+                            <span class="result-label">Word was:</span>
+                            <span class="result-value" id="correct-word">SPACE</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Attempts:</span>
+                            <span class="result-value" id="attempts-used">3/6</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Score:</span>
+                            <span class="result-value" id="round-score">+150</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Time:</span>
+                            <span class="result-value" id="completion-time">02:34</span>
+                        </div>
+                    </div>
+                    <div class="definition-box">
+                        <h3>Definition:</h3>
+                        <p id="word-definition">A continuous area or expanse that is free, available, or unoccupied.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="share-btn">Share 📤</button>
+                    <button class="btn btn-primary" id="next-round-btn">Next Word ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Modal -->
+        <div class="modal" id="stats-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Your Statistics 📊</h2>
+                    <button class="close-btn" id="close-stats">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="games-played">42</div>
+                            <div class="stat-label">Played</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="win-percentage">85</div>
+                            <div class="stat-label">Win %</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="current-streak-stat">5</div>
+                            <div class="stat-label">Current Streak</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="max-streak">12</div>
+                            <div class="stat-label">Max Streak</div>
+                        </div>
+                    </div>
+                    <div class="guess-distribution">
+                        <h3>Guess Distribution</h3>
+                        <div class="distribution-bars">
+                            <div class="distribution-row">
+                                <span class="guess-number">1</span>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: 5%">2</div>
+                                </div>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="guess-number">2</span>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: 15%">6</div>
+                                </div>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="guess-number">3</span>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: 35%">14</div>
+                                </div>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="guess-number">4</span>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: 30%">12</div>
+                                </div>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="guess-number">5</span>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: 10%">4</div>
+                                </div>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="guess-number">6</span>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: 5%">2</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settings-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings ⚙️</h2>
+                    <button class="close-btn" id="close-settings">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-group">
+                        <h3>Game Settings</h3>
+                        <div class="setting-item">
+                            <label for="difficulty-select">Difficulty Level:</label>
+                            <select id="difficulty-select">
+                                <option value="easy">Easy (4 letters)</option>
+                                <option value="normal" selected>Normal (5 letters)</option>
+                                <option value="hard">Hard (6 letters)</option>
+                                <option value="expert">Expert (7 letters)</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="time-limit-toggle">Time Limit:</label>
+                            <input type="checkbox" id="time-limit-toggle" checked>
+                            <span class="toggle-label">Enable timer challenge</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="dark-mode-toggle">Dark Mode:</label>
+                            <input type="checkbox" id="dark-mode-toggle">
+                            <span class="toggle-label">Enable dark theme</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="animation-toggle">Animations:</label>
+                            <input type="checkbox" id="animation-toggle" checked>
+                            <span class="toggle-label">Enable tile animations</span>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Accessibility</h3>
+                        <div class="setting-item">
+                            <label for="high-contrast-toggle">High Contrast:</label>
+                            <input type="checkbox" id="high-contrast-toggle">
+                            <span class="toggle-label">Increase color contrast</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="screen-reader-toggle">Screen Reader:</label>
+                            <input type="checkbox" id="screen-reader-toggle">
+                            <span class="toggle-label">Enhanced announcements</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="reset-stats-btn">Reset Statistics</button>
+                    <button class="btn btn-primary" id="save-settings-btn">Save Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tutorial/Help Modal -->
+        <div class="modal" id="help-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>How to Play 🎮</h2>
+                    <button class="close-btn" id="close-help">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="help-section">
+                        <h3>Objective</h3>
+                        <p>Guess the hidden word in 6 attempts or less. Each guess must be a valid word.</p>
+                    </div>
+                    <div class="help-section">
+                        <h3>How to Play</h3>
+                        <ul>
+                            <li>Type your guess using the keyboard or on-screen keys</li>
+                            <li>Press ENTER to submit your guess</li>
+                            <li>Letters will change color to give you clues</li>
+                        </ul>
+                    </div>
+                    <div class="help-section">
+                        <h3>Color Guide</h3>
+                        <div class="color-examples">
+                            <div class="example-tile correct">A</div>
+                            <span>Correct letter in correct position</span>
+                        </div>
+                        <div class="color-examples">
+                            <div class="example-tile present">B</div>
+                            <span>Correct letter in wrong position</span>
+                        </div>
+                        <div class="color-examples">
+                            <div class="example-tile absent">C</div>
+                            <span>Letter not in the word</span>
+                        </div>
+                    </div>
+                    <div class="help-section">
+                        <h3>Power-ups</h3>
+                        <ul>
+                            <li><strong>💡 Hint:</strong> Get a clue about the word</li>
+                            <li><strong>🔍 Reveal:</strong> Reveal a random correct letter</li>
+                            <li><strong>🔄 Shuffle:</strong> Rearrange the letters you've tried</li>
+                            <li><strong>⏰ +Time:</strong> Add extra time to the timer</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

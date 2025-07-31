@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Dictionary Fetcher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a8a;
+        }
+        .word-count {
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .word-sample {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>📚 Comprehensive Word Dictionary Fetcher</h1>
+    <p>This tool helps you fetch comprehensive 5-letter word lists from various sources.</p>
+
+    <div class="container">
+        <h3>🎯 Available Sources:</h3>
+        <button onclick="fetchFromSource('sowpods')">Fetch SOWPODS (Scrabble Words)</button>
+        <button onclick="fetchFromSource('enable')">Fetch Enable Word List</button>
+        <button onclick="fetchComprehensive()">Build Comprehensive List</button>
+        <button onclick="validateSample()">Validate Sample Words</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="results"></div>
+
+    <script src="word-fetcher.js"></script>
+    <script>
+        const fetcher = new WordFetcher();
+        let currentWordList = [];
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showResults(words) {
+            currentWordList = words;
+            const resultsDiv = document.getElementById('results');
+            
+            const sample = words.slice(0, 50).join(', ');
+            const remaining = words.length > 50 ? `... and ${words.length - 50} more` : '';
+            
+            resultsDiv.innerHTML = `
+                <div class="container">
+                    <div class="word-count">📊 Total Words Found: ${words.length}</div>
+                    <h4>Sample Words (first 50):</h4>
+                    <div class="word-sample">${sample}${remaining}</div>
+                    <button onclick="downloadWordList()">💾 Download Word List</button>
+                    <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                    <button onclick="updateWordle()">🎮 Update Wordle Game</button>
+                </div>
+            `;
+        }
+
+        async function fetchFromSource(source) {
+            showStatus(`🔄 Fetching words from ${source}...`, 'info');
+            try {
+                const words = await fetcher.fetchWordsFromSource(source);
+                showStatus(`✅ Successfully fetched ${words.length} words from ${source}!`, 'success');
+                showResults(words);
+            } catch (error) {
+                showStatus(`❌ Error fetching from ${source}: ${error.message}`, 'error');
+            }
+        }
+
+        async function fetchComprehensive() {
+            showStatus('🔄 Building comprehensive word list...', 'info');
+            try {
+                const words = await fetcher.getWordList();
+                showStatus(`✅ Built comprehensive list with ${words.length} words!`, 'success');
+                showResults(words);
+            } catch (error) {
+                showStatus(`❌ Error building comprehensive list: ${error.message}`, 'error');
+            }
+        }
+
+        async function validateSample() {
+            showStatus('🔄 Validating sample words against dictionary API...', 'info');
+            const sampleWords = ['ABOUT', 'RACER', 'EAGLE', 'HOUSE', 'XYZZZ'];
+            
+            for (const word of sampleWords) {
+                const isValid = await fetcher.validateWord(word);
+                console.log(`${word}: ${isValid ? '✅ Valid' : '❌ Invalid'}`);
+            }
+            showStatus('✅ Validation complete! Check console for results.', 'success');
+        }
+
+        function downloadWordList() {
+            if (currentWordList.length === 0) {
+                showStatus('❌ No word list to download. Please fetch words first.', 'error');
+                return;
+            }
+
+            const content = currentWordList.join('\\n');
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `5-letter-words-${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('📥 Word list downloaded!', 'success');
+        }
+
+        function copyToClipboard() {
+            if (currentWordList.length === 0) {
+                showStatus('❌ No word list to copy. Please fetch words first.', 'error');
+                return;
+            }
+
+            const content = currentWordList.join(', ');
+            navigator.clipboard.writeText(content).then(() => {
+                showStatus('📋 Word list copied to clipboard!', 'success');
+            }).catch(err => {
+                showStatus(`❌ Failed to copy: ${err.message}`, 'error');
+            });
+        }
+
+        function updateWordle() {
+            if (currentWordList.length === 0) {
+                showStatus('❌ No word list to use. Please fetch words first.', 'error');
+                return;
+            }
+
+            // Generate JavaScript code to update the Wordle game
+            const jsCode = `
+// Updated dictionary with ${currentWordList.length} comprehensive 5-letter words
+const comprehensiveWords = [
+    ${currentWordList.map(word => `'${word}'`).join(',\\n    ')}
+];
+
+// Update your VibeWordle createDictionary method:
+createDictionary() {
+    return {
+        5: comprehensiveWords,
+        all: new Set(comprehensiveWords)
+    };
+}`;
+
+            navigator.clipboard.writeText(jsCode).then(() => {
+                showStatus('🎮 Wordle update code copied to clipboard! Paste it into your script.js file.', 'success');
+            }).catch(err => {
+                showStatus(`❌ Failed to copy update code: ${err.message}`, 'error');
+            });
+        }
+
+        // Auto-load on page load
+        window.addEventListener('load', () => {
+            showStatus('🚀 Word Dictionary Fetcher ready! Click a button to start.', 'info');
+        });
+    </script>
+</body>
+</html>
