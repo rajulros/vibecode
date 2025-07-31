@@ -893,8 +893,16 @@ class VibeWordle {
             return;
         }
         
+        // Debug: log the current state
+        console.log('=== SUBMITTING GUESS ===');
+        console.log('Guess:', this.currentGuess);
+        console.log('Target:', this.targetWord);
+        console.log('Row:', this.currentRow);
+        
         // Evaluate the guess
         const evaluation = this.evaluateGuess(this.currentGuess);
+        console.log('Evaluation result:', evaluation);
+        
         this.guesses.push(this.currentGuess);
         this.evaluations.push(evaluation);
         
@@ -918,6 +926,48 @@ class VibeWordle {
         }
     }
     
+    // Debug function to test evaluation logic
+    testEvaluation() {
+        console.log('=== TESTING EVALUATION LOGIC ===');
+        
+        // Test case from user's image
+        this.targetWord = 'MISTY';
+        console.log('Target word set to:', this.targetWord);
+        
+        // Test "STICK" against "MISTY"
+        console.log('\n--- Testing STICK vs MISTY ---');
+        const stickResult = this.evaluateGuess('STICK');
+        console.log('STICK vs MISTY result:', stickResult);
+        console.log('Expected: S=absent, T=present, I=present, C=absent, K=absent');
+        
+        // Test "MISTY" against "MISTY"
+        console.log('\n--- Testing MISTY vs MISTY ---');
+        const mistyResult = this.evaluateGuess('MISTY');
+        console.log('MISTY vs MISTY result:', mistyResult);
+        console.log('Expected: all correct');
+        
+        // Test some other scenarios
+        console.log('\n--- Testing CRANE vs MISTY ---');
+        const craneResult = this.evaluateGuess('CRANE');
+        console.log('CRANE vs MISTY result:', craneResult);
+        
+        console.log('\n--- Testing GHOUL vs MISTY ---');
+        const ghoulResult = this.evaluateGuess('GHOUL');
+        console.log('GHOUL vs MISTY result:', ghoulResult);
+        
+        // Additional test with word containing C
+        console.log('\n--- Testing with a word that contains C ---');
+        this.targetWord = 'MAGIC';
+        console.log('Target word set to:', this.targetWord);
+        const stickMagicResult = this.evaluateGuess('STICK');
+        console.log('STICK vs MAGIC result:', stickMagicResult);
+        
+        console.log('=== TEST COMPLETE ===');
+        
+        // Reset to original word for continued gameplay
+        this.newGame();
+    }
+    
     evaluateGuess(guess) {
         console.log('Evaluating guess:', guess, 'against target:', this.targetWord);
         
@@ -933,30 +983,31 @@ class VibeWordle {
         
         console.log('Target letter counts:', targetLetterCount);
         
-        // First pass: mark correct letters
+        // First pass: mark correct letters (green)
         guessArray.forEach((letter, index) => {
             if (letter === targetArray[index]) {
                 result[index] = 'correct';
                 targetLetterCount[letter]--;
-                console.log(`Position ${index}: ${letter} is CORRECT`);
+                console.log(`Position ${index}: ${letter} is CORRECT (green)`);
             }
         });
         
-        // Second pass: mark present and absent letters
+        // Second pass: mark present (yellow) and absent (gray) letters
         guessArray.forEach((letter, index) => {
             if (result[index] === undefined) {
                 if (targetLetterCount[letter] > 0) {
                     result[index] = 'present';
                     targetLetterCount[letter]--;
-                    console.log(`Position ${index}: ${letter} is PRESENT`);
+                    console.log(`Position ${index}: ${letter} is PRESENT (yellow)`);
                 } else {
                     result[index] = 'absent';
-                    console.log(`Position ${index}: ${letter} is ABSENT`);
+                    console.log(`Position ${index}: ${letter} is ABSENT (gray)`);
                 }
             }
         });
         
         console.log('Final evaluation result:', result);
+        console.log('Target word was:', this.targetWord);
         return result;
     }
     
@@ -1645,6 +1696,18 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         window.vibeWordleGame = new VibeWordle();
         console.log('VibeWordle game instance created successfully');
+        
+        // Make debug functions available
+        window.testWordle = () => window.vibeWordleGame.testEvaluation();
+        window.debugWordle = window.vibeWordleGame;
+        window.checkCurrentGame = () => {
+            console.log('=== CURRENT GAME STATE ===');
+            console.log('Target word:', window.vibeWordleGame.targetWord);
+            console.log('Current guesses:', window.vibeWordleGame.guesses);
+            console.log('Evaluations:', window.vibeWordleGame.evaluations);
+            console.log('Current row:', window.vibeWordleGame.currentRow);
+            console.log('Game state:', window.vibeWordleGame.gameState);
+        };
         
         // Update dictionary status after a short delay to ensure elements are ready
         setTimeout(() => {

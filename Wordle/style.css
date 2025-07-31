@@ -883,28 +883,36 @@ body {
     }
     
     .keyboard {
-        padding: var(--gap-sm) 0 var(--gap-md) 0;
-        gap: var(--gap-xs);
+        padding: var(--gap-sm) var(--gap-xs) var(--gap-md) var(--gap-xs);
+        gap: clamp(2px, 0.5vw, 4px);
         flex-shrink: 0;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .key-row {
-        gap: var(--gap-xs);
+        gap: clamp(2px, 0.5vw, 4px);
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
     
     .key {
         height: 48px;
-        min-width: clamp(28px, 8vw, 38px);
-        font-size: clamp(0.8rem, 2.5vw, 1rem);
+        min-width: clamp(24px, 7vw, 32px);
+        max-width: clamp(32px, 8vw, 40px);
+        font-size: clamp(0.7rem, 2.2vw, 0.9rem);
         border-radius: 6px;
         /* Ensure touch targets are at least 44px */
         min-height: 44px;
         touch-action: manipulation;
+        flex: 0 0 auto;
     }
     
     .key.wide {
-        min-width: clamp(50px, 15vw, 65px);
-        font-size: clamp(0.6rem, 2vw, 0.75rem);
+        min-width: clamp(40px, 12vw, 55px);
+        max-width: clamp(55px, 15vw, 70px);
+        font-size: clamp(0.6rem, 1.8vw, 0.7rem);
     }
     
     .stats-grid {
@@ -1015,24 +1023,34 @@ body {
     }
     
     .keyboard {
-        padding: var(--gap-xs) 0 var(--gap-sm) 0;
-        gap: 2px;
+        padding: var(--gap-xs) 2px var(--gap-sm) 2px;
+        gap: 1px;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .key-row {
-        gap: 2px;
+        gap: 1px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     
     .key {
         height: 42px;
-        min-width: clamp(25px, 7vw, 32px);
-        font-size: clamp(0.7rem, 2vw, 0.9rem);
+        min-width: clamp(22px, 6.5vw, 28px);
+        max-width: clamp(28px, 7.5vw, 32px);
+        font-size: clamp(0.6rem, 2vw, 0.8rem);
         min-height: 40px;
+        flex: 0 0 auto;
+        padding: 0;
     }
     
     .key.wide {
-        min-width: clamp(45px, 13vw, 55px);
-        font-size: clamp(0.55rem, 1.8vw, 0.65rem);
+        min-width: clamp(35px, 11vw, 45px);
+        max-width: clamp(45px, 13vw, 55px);
+        font-size: clamp(0.5rem, 1.6vw, 0.65rem);
     }
     
     .modal-content {

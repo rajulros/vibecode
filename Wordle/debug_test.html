@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wordle Debug Test</title>
+</head>
+<body>
+    <h1>Wordle Evaluation Debug Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        function evaluateGuess(guess, targetWord) {
+            console.log('Evaluating guess:', guess, 'against target:', targetWord);
+            
+            const result = [];
+            const targetArray = targetWord.split('');
+            const guessArray = guess.split('');
+            const targetLetterCount = {};
+            
+            // Count letters in target word
+            targetArray.forEach(letter => {
+                targetLetterCount[letter] = (targetLetterCount[letter] || 0) + 1;
+            });
+            
+            console.log('Target letter counts:', targetLetterCount);
+            
+            // First pass: mark correct letters (green)
+            guessArray.forEach((letter, index) => {
+                if (letter === targetArray[index]) {
+                    result[index] = 'correct';
+                    targetLetterCount[letter]--;
+                    console.log(`Position ${index}: ${letter} is CORRECT (green)`);
+                }
+            });
+            
+            // Second pass: mark present (yellow) and absent (gray) letters
+            guessArray.forEach((letter, index) => {
+                if (result[index] === undefined) {
+                    if (targetLetterCount[letter] > 0) {
+                        result[index] = 'present';
+                        targetLetterCount[letter]--;
+                        console.log(`Position ${index}: ${letter} is PRESENT (yellow)`);
+                    } else {
+                        result[index] = 'absent';
+                        console.log(`Position ${index}: ${letter} is ABSENT (gray)`);
+                    }
+                }
+            });
+            
+            console.log('Final evaluation result:', result);
+            return result;
+        }
+        
+        function runTests() {
+            const results = document.getElementById('results');
+            
+            // Test the scenario from user's image
+            console.log('=== TESTING STICK vs MISTY ===');
+            const stickResult = evaluateGuess('STICK', 'MISTY');
+            results.innerHTML += `<h3>STICK vs MISTY:</h3>`;
+            results.innerHTML += `<p>Result: ${JSON.stringify(stickResult)}</p>`;
+            results.innerHTML += `<p>Expected: ["present", "present", "present", "absent", "absent"]</p>`;
+            
+            console.log('=== TESTING MISTY vs MISTY ===');
+            const mistyResult = evaluateGuess('MISTY', 'MISTY');
+            results.innerHTML += `<h3>MISTY vs MISTY:</h3>`;
+            results.innerHTML += `<p>Result: ${JSON.stringify(mistyResult)}</p>`;
+            results.innerHTML += `<p>Expected: ["correct", "correct", "correct", "correct", "correct"]</p>`;
+            
+            // Additional test
+            console.log('=== TESTING STICK vs MAGIC ===');
+            const stickMagicResult = evaluateGuess('STICK', 'MAGIC');
+            results.innerHTML += `<h3>STICK vs MAGIC:</h3>`;
+            results.innerHTML += `<p>Result: ${JSON.stringify(stickMagicResult)}</p>`;
+            results.innerHTML += `<p>Expected C should be present (yellow) since it exists in MAGIC</p>`;
+        }
+        
+        // Run tests when page loads
+        window.onload = runTests;
+    </script>
+</body>
+</html>
