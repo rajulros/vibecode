@@ -1,0 +1,20 @@
+{
+    "chat.promptFiles": true,
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": true,
+        "plaintext": true,
+        "markdown": true
+    },
+    "github.copilot.chat.welcomeMessage": "never",
+    "github.copilot.chat.localeOverride": "en",
+    "files.associations": {
+        "*.js": "javascript",
+        "*.html": "html",
+        "*.css": "css"
+    },
+    "editor.suggest.showInlineDetails": true,
+    "editor.inlineSuggest.enabled": true,
+    "workbench.editor.enablePreview": false,
+    "explorer.confirmDelete": false
+}
